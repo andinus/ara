@@ -1,0 +1,14 @@
+#+HTML_HEAD: <link rel="stylesheet" href="../static/style.css">
+#+HTML_HEAD: <link rel="icon" href="../static/favicon.png" type="image/png">
+#+EXPORT_FILE_NAME: index
+#+TITLE: Ara
+
+Ara is a simple cli program that prints Covid-19 stats.
+
+| Project Home    | [[https://andinus.nand.sh/ara/][Ara]]           |
+| Source Code     | [[https://git.tilde.institute/andinus/ara/][Andinus / Ara]] |
+| GitHub (Mirror) | [[https://github.com/andinus/ara/][Ara - GitHub]]  |
+
+*Tested on*:
+- OpenBSD 6.7
+  - Perl v5.30
