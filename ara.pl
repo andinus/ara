@@ -74,10 +74,10 @@ foreach my $i (0...37) {
     if ( substr( $lastupdatedtime, 0, 10 ) eq $today->dmy('/') ) {
         $update_info = "Today";
     } elsif ( substr( $lastupdatedtime, 0, 10 ) eq
-              $today->subtract( days => 1 )->dmy('/') ) {
+              $today->clone->subtract( days => 1 )->dmy('/') ) {
         $update_info = "Yesterday";
     } elsif ( substr( $lastupdatedtime, 0, 10 ) eq
-              $today->add( days => 1 )->dmy('/') ) {
+              $today->clone->add( days => 1 )->dmy('/') ) {
         $update_info = "Tomorrow"; # Hopefully we don't see this.
     } else {
         $update_info =
