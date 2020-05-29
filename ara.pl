@@ -69,14 +69,15 @@ my $today = DateTime->now( time_zone => 'UTC' );
 foreach my $i (0...37) {
     my $update_info;
     my $lastupdatedtime = $statewise[0][$i]{'lastupdatedtime'};
+    my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
 
     # Add $update_info.
-    if ( substr( $lastupdatedtime, 0, 10 ) eq $today->dmy('/') ) {
+    if ( $last_update_dmy eq $today->dmy('/') ) {
         $update_info = "Today";
-    } elsif ( substr( $lastupdatedtime, 0, 10 ) eq
+    } elsif ( $last_update_dmy eq
               $today->clone->subtract( days => 1 )->dmy('/') ) {
         $update_info = "Yesterday";
-    } elsif ( substr( $lastupdatedtime, 0, 10 ) eq
+    } elsif ( $last_update_dmy eq
               $today->clone->add( days => 1 )->dmy('/') ) {
         $update_info = "Tomorrow"; # Hopefully we don't see this.
     } else {
