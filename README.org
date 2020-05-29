@@ -15,11 +15,6 @@ only prints India's Covid stats.
 - OpenBSD 6.7
   - Perl v5.30
 
-*CPAN Modules*:
-- YAML
-- Path::Tiny
-- JSON::MaybeXS
-
 *Note*: Ara has /OpenBSD/ specific code, remove =OpenBSD::Unveil= to run on
  other systems.
 
