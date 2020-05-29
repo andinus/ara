@@ -63,7 +63,7 @@ my $rows = [
     ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths', 'Last Updated'],
     ];
 
-my $today = DateTime->now( time_zone => 'UTC' );
+my $today = DateTime->now( time_zone => 'Asia/Kolkata' );
 
 # Add first 37 entries to $rows.
 foreach my $i (0...37) {
