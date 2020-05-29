@@ -24,10 +24,48 @@ only prints India's Covid stats.
  other systems.
 
 * Example
-Running =ara= on 2020-05-29:
+Running =ara= on 2020-05-29 at 20:38:
 #+BEGIN_SRC
-confirmed: 165729
-recovered: 70920
-active: 90087
-deaths: 4711
++--------------------+----------------+--------+--------------+---------------+--------------+
+| State              | Confirmed      | Active | Recovered    | Deaths        | Last Updated |
++--------------------+----------------+--------+--------------+---------------+--------------+
+| Total              | 171693 (+6336) | 85819  | 80927 (+225) | 4936 (+10029) | Today        |
+| Maharashtra        | 62228 (+2682)  | 33133  | 26997 (+116) | 2098 (+8381)  | Today        |
+| Tamil Nadu         | 20246 (+874)   | 8776   | 11313 (+9)   | 157 (+765)    | Today        |
+| Delhi              | 17387 (+1106)  | 9143   | 7846 (+82)   | 398 (+351)    | Today        |
+| Gujarat            | 15572 (+0)     | 6609   | 8003 (+0)    | 960 (+0)      | Yesterday    |
+| Rajasthan          | 8158 (+91)     | 3121   | 4855 (+2)    | 182 (+40)     | Today        |
+| Madhya Pradesh     | 7453 (+0)      | 3082   | 4050 (+0)    | 321 (+0)      | Yesterday    |
+| Uttar Pradesh      | 7170 (+0)      | 2758   | 4215 (+0)    | 197 (+0)      | Yesterday    |
+| West Bengal        | 4813 (+277)    | 2736   | 1775 (+7)    | 302 (+107)    | Today        |
+| State Unassigned   | 4673 (+341)    | 4673   | 0 (+0)       | 0 (+0)        | Today        |
+| Andhra Pradesh     | 3330 (+85)     | 1036   | 2234 (+1)    | 60 (+101)     | Today        |
+| Bihar              | 3275 (+90)     | 2210   | 1050 (+0)    | 15 (+0)       | Today        |
+| Karnataka          | 2781 (+248)    | 1837   | 894 (+1)     | 48 (+60)      | Today        |
+| Punjab             | 2197 (+39)     | 206    | 1949 (+2)    | 42 (+3)       | Today        |
+| Telangana          | 2256 (+0)      | 844    | 1345 (+0)    | 67 (+0)       | Yesterday    |
+| Jammu and Kashmir  | 2164 (+128)    | 1261   | 875 (+1)     | 28 (+16)      | Today        |
+| Odisha             | 1723 (+63)     | 737    | 977 (+2)     | 9 (+90)       | Today        |
+| Haryana            | 1535 (+31)     | 632    | 884 (+0)     | 19 (+3)       | Today        |
+| Kerala             | 1151 (+62)     | 577    | 565 (+1)     | 9 (+10)       | Today        |
+| Assam              | 936 (+55)      | 803    | 126 (+0)     | 4 (+22)       | Today        |
+| Uttarakhand        | 602 (+102)     | 506    | 89 (+0)      | 4 (+10)       | Today        |
+| Jharkhand          | 469 (+30)      | 253    | 212 (+0)     | 4 (+59)       | Today        |
+| Chhattisgarh       | 404 (+6)       | 320    | 83 (+1)      | 1 (+0)        | Today        |
+| Chandigarh         | 289 (+0)       | 96     | 189 (+0)     | 4 (+0)        | Yesterday    |
+| Himachal Pradesh   | 291 (+10)      | 201    | 81 (+0)      | 6 (+8)        | Today        |
+| Tripura            | 244 (+0)       | 77     | 167 (+0)     | 0 (+0)        | Yesterday    |
+| Goa                | 69 (+0)        | 28     | 41 (+0)      | 0 (+3)        | Today        |
+| Ladakh             | 74 (+0)        | 31     | 43 (+0)      | 0 (+0)        | Yesterday    |
+| Puducherry         | 53 (+0)        | 36     | 17 (+0)      | 0 (+0)        | Yesterday    |
+| Manipur            | 58 (+3)        | 54     | 4 (+0)       | 0 (+0)        | Today        |
+| Andaman and Nicoba | 33 (+0)        | 0      | 33 (+0)      | 0 (+0)        | May 07       |
+| Meghalaya          | 27 (+6)        | 14     | 12 (+0)      | 1 (+0)        | Today        |
+| Nagaland           | 25 (+7)        | 25     | 0 (+0)       | 0 (+0)        | Today        |
+| Dadra and Nagar Ha | 2 (+0)         | 1      | 1 (+0)       | 0 (+0)        | May 23       |
+| Arunachal Pradesh  | 3 (+0)         | 2      | 1 (+0)       | 0 (+0)        | Today        |
+| Mizoram            | 1 (+0)         | 0      | 1 (+0)       | 0 (+0)        | May 05       |
+| Sikkim             | 1 (+0)         | 1      | 0 (+0)       | 0 (+0)        | May 23       |
+| Lakshadweep        | 0 (+0)         | 0      | 0 (+0)       | 0 (+0)        | Mar 26       |
++--------------------+----------------+--------+--------------+---------------+--------------+
 #+END_SRC
