@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use feature 'say';
 
+use DateTime qw( );
 use Path::Tiny;
 use File::Fetch;
 use Data::Dumper;
@@ -62,9 +63,27 @@ my $rows = [
     ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths', 'Last Updated'],
     ];
 
+my $today = DateTime->now( time_zone => 'UTC' );
+my $yesterday = DateTime->now( time_zone => 'UTC' )->subtract( days => 1 );
+
 # Add first 37 entries to $rows.
 foreach my $i (0...37) {
+    my $update_info;
     my $lastupdatedtime = $statewise[0][$i]{'lastupdatedtime'};
+
+    # Add $update_info.
+    if ( substr( $lastupdatedtime, 0, 10 ) eq $today->dmy('/') ) {
+        $update_info = "Today";
+    } elsif ( substr( $lastupdatedtime, 0, 10 ) eq
+              $yesterday->dmy('/') ) {
+        $update_info = "Yesterday";
+    } else {
+        $update_info =
+            $months[substr( $lastupdatedtime, 3, 2 )] .
+            " " .
+            substr( $lastupdatedtime, 0, 2 );
+    }
+
     push @$rows, [
         # Limit the length to 18 characters, this will cut long state
         # names.
@@ -74,7 +93,7 @@ foreach my $i (0...37) {
         $statewise[0][$i]{'active'},
         "$statewise[0][$i]{'recovered'} (+$statewise[0][$i]{'deltadeaths'})",
         "$statewise[0][$i]{'deaths'} (+$statewise[0][$i]{'deltarecovered'})",
-        $months[substr( $lastupdatedtime, 3, 5 )] . " " . substr( $lastupdatedtime, 0, 2 ),
+        $update_info,
         ];
 }
 
