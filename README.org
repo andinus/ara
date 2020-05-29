@@ -3,7 +3,8 @@
 #+EXPORT_FILE_NAME: index
 #+TITLE: Ara
 
-Ara is a simple cli program that prints Covid-19 stats.
+Ara is a simple cli program that prints Covid-19 stats. Currently it
+only prints India's Covid stats.
 
 | Project Home    | [[https://andinus.nand.sh/ara/][Ara]]           |
 | Source Code     | [[https://git.tilde.institute/andinus/ara/][Andinus / Ara]] |
@@ -12,3 +13,11 @@ Ara is a simple cli program that prints Covid-19 stats.
 *Tested on*:
 - OpenBSD 6.7
   - Perl v5.30
+
+*CPAN Modules*:
+- YAML
+- Path::Tiny
+- JSON::MaybeXS
+
+*Note*: Ara has /OpenBSD/ specific code, remove =OpenBSD::Unveil= to run on
+ other systems.
