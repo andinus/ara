@@ -7,7 +7,6 @@ use feature 'say';
 use DateTime qw( );
 use Path::Tiny;
 use File::Fetch;
-use Data::Dumper;
 use JSON::MaybeXS qw( decode_json );
 use Text::Table::Tiny qw( generate_table );
 
