@@ -56,11 +56,12 @@ my $json_data = decode_json($file_data);
 my @statewise = ${$json_data}{'statewise'};
 
 my $rows = [
-    ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths'],
+    ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths', 'Last Updated'],
     ];
 
 # Add first 37 entries to $rows.
 foreach my $i (0...37) {
+    my $lastupdatedtime = $statewise[0][$i]{'lastupdatedtime'};
     push @$rows, [
         # Limit the length to 18 characters, this will cut long state
         # names.
@@ -70,6 +71,7 @@ foreach my $i (0...37) {
         $statewise[0][$i]{'active'},
         "$statewise[0][$i]{'recovered'} (+$statewise[0][$i]{'deltadeaths'})",
         "$statewise[0][$i]{'deaths'} (+$statewise[0][$i]{'deltarecovered'})",
+        substr( $lastupdatedtime, 0, 5 ),
         ];
 }
 
