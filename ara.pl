@@ -87,11 +87,15 @@ foreach my $i (0...37) {
             substr( $lastupdatedtime, 0, 2 );
     }
 
-    push @$rows, [
-        # Limit the length to 18 characters, this will cut long state
-        # names.
-        substr( $statewise[0][$i]{'state'}, 0, 18 ),
+    my $state = $statewise[0][$i]{'state'};
+    $state = "India" if
+        $state eq "Total";
 
+    $state = $statewise[0][$i]{'statecode'} if
+        length($state) > 16;
+
+    push @$rows, [
+        $state,
         "$statewise[0][$i]{'confirmed'} (+$statewise[0][$i]{'deltaconfirmed'})" ,
         $statewise[0][$i]{'active'},
         "$statewise[0][$i]{'recovered'} (+$statewise[0][$i]{'deltadeaths'})",
