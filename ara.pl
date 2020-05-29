@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use feature 'say';
 
-use YAML qw( Bless Dump );
 use Path::Tiny;
 use File::Fetch;
 use Data::Dumper;
-use JSON::MaybeXS;
+use JSON::MaybeXS qw( decode_json );
+use Text::Table::Tiny qw( generate_table );
 
 use OpenBSD::Unveil;
 
@@ -52,8 +52,26 @@ unveil() or
 # Decode $file_data to $json_data.
 my $json_data = decode_json($file_data);
 
-# Print total.
-my $total = $json_data->{'statewise'}[0];
+# Get statewise information.
+my @statewise = ${$json_data}{'statewise'};
 
-Bless($total)->keys( ['confirmed', 'recovered', 'active', 'deaths'] );
-print Dump $total;
+my $rows = [
+    ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths'],
+    ];
+
+# Add first 37 entries to $rows.
+foreach my $i (0...37) {
+    push @$rows, [
+        # Limit the length to 18 characters, this will cut long state
+        # names.
+        substr( $statewise[0][$i]{'state'}, 0, 18 ),
+
+        "$statewise[0][$i]{'confirmed'} (+$statewise[0][$i]{'deltaconfirmed'})" ,
+        $statewise[0][$i]{'active'},
+        "$statewise[0][$i]{'recovered'} (+$statewise[0][$i]{'deltadeaths'})",
+        "$statewise[0][$i]{'deaths'} (+$statewise[0][$i]{'deltarecovered'})",
+        ];
+}
+
+# Generate table.
+say generate_table(rows => $rows, header_row => 1);
