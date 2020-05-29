@@ -55,6 +55,9 @@ my $json_data = decode_json($file_data);
 # Get statewise information.
 my @statewise = ${$json_data}{'statewise'};
 
+# Map month number to Months.
+my @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+
 my $rows = [
     ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths', 'Last Updated'],
     ];
@@ -71,7 +74,7 @@ foreach my $i (0...37) {
         $statewise[0][$i]{'active'},
         "$statewise[0][$i]{'recovered'} (+$statewise[0][$i]{'deltadeaths'})",
         "$statewise[0][$i]{'deaths'} (+$statewise[0][$i]{'deltarecovered'})",
-        substr( $lastupdatedtime, 0, 5 ),
+        $months[substr( $lastupdatedtime, 3, 5 )] . " " . substr( $lastupdatedtime, 0, 2 ),
         ];
 }
 
