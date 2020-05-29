@@ -1,5 +1,6 @@
 #+HTML_HEAD: <link rel="stylesheet" href="../static/style.css">
 #+HTML_HEAD: <link rel="icon" href="../static/favicon.png" type="image/png">
+#+OPTIONS: toc:nil
 #+EXPORT_FILE_NAME: index
 #+TITLE: Ara
 
@@ -21,3 +22,12 @@ only prints India's Covid stats.
 
 *Note*: Ara has /OpenBSD/ specific code, remove =OpenBSD::Unveil= to run on
  other systems.
+
+* Example
+Running =ara= on 2020-05-29:
+#+BEGIN_SRC
+confirmed: 165729
+recovered: 70920
+active: 90087
+deaths: 4711
+#+END_SRC
