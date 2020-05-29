@@ -64,7 +64,6 @@ my $rows = [
     ];
 
 my $today = DateTime->now( time_zone => 'UTC' );
-my $yesterday = DateTime->now( time_zone => 'UTC' )->subtract( days => 1 );
 
 # Add first 37 entries to $rows.
 foreach my $i (0...37) {
@@ -75,8 +74,11 @@ foreach my $i (0...37) {
     if ( substr( $lastupdatedtime, 0, 10 ) eq $today->dmy('/') ) {
         $update_info = "Today";
     } elsif ( substr( $lastupdatedtime, 0, 10 ) eq
-              $yesterday->dmy('/') ) {
+              $today->subtract( days => 1 )->dmy('/') ) {
         $update_info = "Yesterday";
+    } elsif ( substr( $lastupdatedtime, 0, 10 ) eq
+              $today->add( days => 1 )->dmy('/') ) {
+        $update_info = "Tomorrow"; # Hopefully we don't see this.
     } else {
         $update_info =
             $months[substr( $lastupdatedtime, 3, 2 )] .
