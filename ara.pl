@@ -52,6 +52,9 @@ unveil() or
 # Decode $file_data to $json_data.
 my $json_data = decode_json($file_data);
 
+# Get statewise information.
+my $statewise = $json_data->{statewise};
+
 # Map month number to Months.
 my @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
@@ -64,7 +67,7 @@ my $today = DateTime->now( time_zone => 'Asia/Kolkata' );
 # Add first 37 entries to $rows.
 foreach my $i (0...37) {
     my $update_info;
-    my $lastupdatedtime = $json_data->{statewise}[$i]{'lastupdatedtime'};
+    my $lastupdatedtime = $statewise->[$i]{'lastupdatedtime'};
     my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
 
     # Add $update_info.
@@ -83,19 +86,19 @@ foreach my $i (0...37) {
             substr( $lastupdatedtime, 0, 2 );
     }
 
-    my $state = $json_data->{statewise}[$i]{'state'};
+    my $state = $statewise->[$i]{'state'};
     $state = "India" if
         $state eq "Total";
 
-    $state = $json_data->{statewise}[$i]{'statecode'} if
+    $state = $statewise->[$i]{'statecode'} if
         length($state) > 16;
 
     push @$rows, [
         $state,
-        "$json_data->{statewise}[$i]{'confirmed'} (+$json_data->{statewise}[$i]{'deltaconfirmed'})" ,
-        $json_data->{statewise}[$i]{'active'},
-        "$json_data->{statewise}[$i]{'recovered'} (+$json_data->{statewise}[$i]{'deltadeaths'})",
-        "$json_data->{statewise}[$i]{'deaths'} (+$json_data->{statewise}[$i]{'deltarecovered'})",
+        "$statewise->[$i]{'confirmed'} (+$statewise->[$i]{'deltaconfirmed'})" ,
+        $statewise->[$i]{'active'},
+        "$statewise->[$i]{'recovered'} (+$statewise->[$i]{'deltadeaths'})",
+        "$statewise->[$i]{'deaths'} (+$statewise->[$i]{'deltarecovered'})",
         $update_info,
         ];
 }
