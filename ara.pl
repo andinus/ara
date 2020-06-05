@@ -34,13 +34,31 @@ while( my( $path, $permission ) = each %unveil ) {
         die "Unable to unveil: $!";
 }
 
-# Fetch latest data from api.
-my $url = 'https://api.covid19india.org/data.json';
-my $ff = File::Fetch->new(uri => $url);
+my $file = '/tmp/data.json';
+my $file_mtime;
 
-# Save the api response under /tmp.
-my $file = $ff->fetch( to => '/tmp' ) or
-    die $ff->error;
+# If $file exists then get mtime.
+if ( -e $file ) {
+    my $file_stat = path($file)->stat;
+    $file_mtime = DateTime->from_epoch(
+        epoch => $file_stat->[9],
+        time_zone => 'Asia/Kolkata',
+        );
+}
+
+# Fetch latest data only if the local data is older than 8 minutes or
+# if the file doesn't exist.
+if ( ( not -e $file ) or
+     ( $file_mtime <
+       DateTime->now( time_zone => 'Asia/Kolkata' )->subtract( minutes => 8 ) ) ) {
+    # Fetch latest data from api.
+    my $url = 'https://api.covid19india.org/data.json';
+    my $ff = File::Fetch->new(uri => $url);
+
+    # Save the api response under /tmp.
+    $file = $ff->fetch( to => '/tmp' ) or
+        die $ff->error;
+}
 
 # Slurp api response to $file_data.
 my $file_data = path($file)->slurp;
