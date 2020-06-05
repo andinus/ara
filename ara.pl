@@ -9,6 +9,7 @@ use Path::Tiny;
 use File::Fetch;
 use JSON::MaybeXS qw( decode_json );
 use Text::Table::Tiny qw( generate_table );
+use Text::ASCIITable;
 
 use OpenBSD::Unveil;
 
@@ -80,10 +81,9 @@ my $covid_19_data = [
     ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths', 'Last Updated'],
     ];
 
-my $state_notes = [
-    ['State', 'Notes'],
-    ];
-
+my $state_notes = Text::ASCIITable->new( { drawRowLine => 1 } );
+$state_notes->setCols( 'State', 'Notes' );
+$state_notes->setColWidth( 'Notes', 84 );
 
 my $today = DateTime->now( time_zone => 'Asia/Kolkata' );
 
@@ -136,13 +136,13 @@ foreach my $i (0...37) {
         $update_info,
         ];
 
-    push @$state_notes, [
+    $state_notes->addRow(
         $state,
         $statewise->[$i]{statenotes},
-        ] unless
+        ) unless
         length($statewise->[$i]{statenotes}) eq 0;
 }
 
 # Generate tables.
 say generate_table(rows => $covid_19_data, header_row => 1);
-say generate_table(rows => $state_notes, header_row => 1);
+print $state_notes;
