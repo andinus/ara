@@ -111,18 +111,16 @@ foreach my $i (0...37) {
     $state = $statewise->[$i]{'statecode'} if
         length($state) > 16;
 
-    # Add delta only if it was updated Today.
     my $confirmed = "$statewise->[$i]{confirmed}";
-    $confirmed .= " (+$statewise->[$i]{deltaconfirmed})" if
-        $update_info eq "Today";
-
     my $recovered = "$statewise->[$i]{recovered}";
-    $recovered .= " (+$statewise->[$i]{deltarecovered})" if
-        $update_info eq "Today";
-
     my $deaths = "$statewise->[$i]{deaths}";
-    $deaths .= " (+$statewise->[$i]{deltadeaths})" if
-        $update_info eq "Today";
+
+    # Add delta only if it was updated Today.
+    if ( $update_info eq "Today" ) {
+        $confirmed .= " (+$statewise->[$i]{deltaconfirmed})";
+        $recovered .= " (+$statewise->[$i]{deltarecovered})";
+        $deaths .= " (+$statewise->[$i]{deltadeaths})";
+    }
 
     push @$rows, [
         $state,
