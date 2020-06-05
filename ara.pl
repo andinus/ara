@@ -76,9 +76,14 @@ my $statewise = $json_data->{statewise};
 # Map month number to Months.
 my @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
-my $rows = [
+my $covid_19_data = [
     ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths', 'Last Updated'],
     ];
+
+my $state_notes = [
+    ['State', 'Notes'],
+    ];
+
 
 my $today = DateTime->now( time_zone => 'Asia/Kolkata' );
 
@@ -122,7 +127,7 @@ foreach my $i (0...37) {
         $deaths .= " (+$statewise->[$i]{deltadeaths})";
     }
 
-    push @$rows, [
+    push @$covid_19_data, [
         $state,
         $confirmed,
         $statewise->[$i]{'active'},
@@ -130,7 +135,14 @@ foreach my $i (0...37) {
         $deaths,
         $update_info,
         ];
+
+    push @$state_notes, [
+        $state,
+        $statewise->[$i]{statenotes},
+        ] unless
+        length($statewise->[$i]{statenotes}) eq 0;
 }
 
-# Generate table.
-say generate_table(rows => $rows, header_row => 1);
+# Generate tables.
+say generate_table(rows => $covid_19_data, header_row => 1);
+say generate_table(rows => $state_notes, header_row => 1);
