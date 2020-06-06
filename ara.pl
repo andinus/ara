@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use feature 'say';
 
 use Path::Tiny;
 use Time::Moment;
