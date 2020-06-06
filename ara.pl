@@ -6,8 +6,9 @@ use feature 'say';
 
 use Path::Tiny;
 use Time::Moment;
-use JSON::MaybeXS qw( decode_json );
 use Text::ASCIITable;
+use Getopt::Long qw( GetOptions );
+use JSON::MaybeXS qw( decode_json );
 
 use OpenBSD::Unveil;
 
@@ -16,6 +17,18 @@ foreach my $path (@INC) {
     unveil( $path, 'rx' ) or
         die "Unable to unveil: $!";
 }
+
+my ( $use_local_file, $get_latest, $state_notes );
+
+GetOptions(
+    "local" => \$use_local_file,
+    "latest" => \$get_latest,
+    "notes" => \$state_notes,
+    ) or
+    die "Error in command line arguments";
+
+die "Can't use --local and --latest together\n" if
+    ( $use_local_file and $get_latest );
 
 # %unveil contains list of paths to unveil with their permissions.
 my %unveil = (
@@ -40,13 +53,17 @@ my $file_mtime;
 if ( -e $file ) {
     my $file_stat = path($file)->stat;
     $file_mtime = Time::Moment->from_epoch( $file_stat->[9] );
+} else {
+    die "File '$file' doesn't exist\n" if
+        $use_local_file;
 }
 
 # Fetch latest data only if the local data is older than 8 minutes or
 # if the file doesn't exist.
 if ( ( not -e $file ) or
      ( $file_mtime <
-       Time::Moment->now_utc->minus_minutes(8) ) ) {
+       Time::Moment->now_utc->minus_minutes(8) ) or
+     $get_latest ) {
     require File::Fetch;
 
     # Fetch latest data from api.
@@ -88,10 +105,12 @@ $covid_19_data->alignCol( { 'Confirmed' => 'left',
                                 'Deaths' => 'left',
                           } );
 
-
-my $state_notes = Text::ASCIITable->new( { drawRowLine => 1 } );
-$state_notes->setCols( qw( State Notes ) );
-$state_notes->setColWidth( 'Notes', 84 );
+my $notes_table;
+if ( $state_notes ) {
+    $notes_table = Text::ASCIITable->new( { drawRowLine => 1 } );
+    $notes_table->setCols( qw( State Notes ) );
+    $notes_table->setColWidth( 'Notes', 84 );
+}
 
 my $today = Time::Moment
     ->now_utc
@@ -147,13 +166,16 @@ foreach my $i (0...37) {
         $update_info,
         );
 
-    $state_notes->addRow(
+    $notes_table->addRow(
         $state,
         $statewise->[$i]{statenotes},
         ) unless
-        length($statewise->[$i]{statenotes}) == 0;
+        (
+         ( length($statewise->[$i]{statenotes}) == 0 ) or
+         ( not $state_notes ) );
 }
 
 # Generate tables.
 print $covid_19_data;
-print $state_notes;
+print $notes_table if
+    $state_notes;
