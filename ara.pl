@@ -53,8 +53,10 @@ my %unveil = (
 
 # Unveil each path from %unveil.
 keys %unveil;
-while( my( $path, $permission ) = each %unveil ) {
-    unveil( $path, $permission ) or
+
+# We use sort because otherwise keys is random order everytime.
+foreach my $path ( sort keys %unveil ) {
+    unveil( $path, $unveil{$path} ) or
         die "Unable to unveil: $!";
 }
 
@@ -99,7 +101,6 @@ my $json_data = decode_json($file_data);
 
 # Get statewise information.
 my $statewise = $json_data->{statewise};
-
 
 my ( $covid_19_data, $notes_table, @months, $today );
 
