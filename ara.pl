@@ -195,6 +195,8 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
 }
 
 # Generate tables.
-$state_notes ?
-    print $notes_table :
+if ( $state_notes ) {
+    print $notes_table;
+} else {
     print $covid_19_data;
+}
