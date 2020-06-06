@@ -1,4 +1,4 @@
-requires 'DateTime', '1.52';
+requires 'Time::Moment', '0.44';
 requires 'Path::Tiny', '0.114';
 requires 'File::Fetch', '0.56';
 requires 'JSON::MaybeXS', '1.004002';
