@@ -7,7 +7,6 @@ use feature 'say';
 use Path::Tiny;
 use Time::Moment;
 use JSON::MaybeXS qw( decode_json );
-use Text::Table::Tiny qw( generate_table );
 use Text::ASCIITable;
 
 use OpenBSD::Unveil;
@@ -75,12 +74,23 @@ my $statewise = $json_data->{statewise};
 # Map month number to Months.
 my @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
-my $covid_19_data = [
-    ['State', 'Confirmed', 'Active', 'Recovered', 'Deaths', 'Last Updated'],
-    ];
+my $covid_19_data = Text::ASCIITable->new();
+$covid_19_data->setCols( 'State',
+                         'Confirmed',
+                         'Active',
+                         'Recovered',
+                         'Deaths',
+                         'Last Updated',
+    );
+
+$covid_19_data->alignCol( { 'Confirmed' => 'left',
+                                'Recovered' => 'left',
+                                'Deaths' => 'left',
+                          } );
+
 
 my $state_notes = Text::ASCIITable->new( { drawRowLine => 1 } );
-$state_notes->setCols( 'State', 'Notes' );
+$state_notes->setCols( qw( State Notes ) );
 $state_notes->setColWidth( 'Notes', 84 );
 
 my $today = Time::Moment
@@ -128,14 +138,14 @@ foreach my $i (0...37) {
         $deaths .= " (+$statewise->[$i]{deltadeaths})";
     }
 
-    push @$covid_19_data, [
+    $covid_19_data->addRow(
         $state,
         $confirmed,
         $statewise->[$i]{active},
         $recovered,
         $deaths,
         $update_info,
-        ];
+        );
 
     $state_notes->addRow(
         $state,
@@ -145,5 +155,5 @@ foreach my $i (0...37) {
 }
 
 # Generate tables.
-say generate_table(rows => $covid_19_data, header_row => 1);
+print $covid_19_data;
 print $state_notes;
