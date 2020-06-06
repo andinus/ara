@@ -13,8 +13,8 @@ use OpenBSD::Unveil;
 
 # Unveil @INC.
 foreach my $path (@INC) {
-    unveil( $path, 'rx' ) or
-        die "Unable to unveil: $!";
+    unveil( $path, 'rx' )
+        or die "Unable to unveil: $!";
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print );
@@ -25,8 +25,7 @@ GetOptions(
     "notes" => \$state_notes,
     "rows=i" => \$rows_to_print,
     "help" => sub { HelpMessage() },
-    ) or
-    die "Error in command line arguments";
+) or die "Error in command line arguments";
 
 sub HelpMessage {
     print "Options:
@@ -39,8 +38,8 @@ sub HelpMessage {
     exit;
 }
 
-die "Can't use --local and --latest together\n" if
-    ( $use_local_file and $get_latest );
+die "Can't use --local and --latest together\n"
+    if $use_local_file and $get_latest ;
 
 # %unveil contains list of paths to unveil with their permissions.
 my %unveil = (
@@ -49,15 +48,15 @@ my %unveil = (
     "/home" => "", # Veil "/home", we don't want to read it.
     "/tmp" => "rwc",
     "/dev/null" => "rw",
-    );
+);
 
 # Unveil each path from %unveil.
 keys %unveil;
 
 # We use sort because otherwise keys is random order everytime.
 foreach my $path ( sort keys %unveil ) {
-    unveil( $path, $unveil{$path} ) or
-        die "Unable to unveil: $!";
+    unveil( $path, $unveil{$path} )
+        or die "Unable to unveil: $!";
 }
 
 my $file = '/tmp/data.json';
@@ -68,16 +67,15 @@ if ( -e $file ) {
     my $file_stat = path($file)->stat;
     $file_mtime = Time::Moment->from_epoch( $file_stat->[9] );
 } else {
-    warn "File '$file' doesn't exist\nFetching latest...\n" if
-        $use_local_file;
+    warn "File '$file' doesn't exist\nFetching latest...\n"
+        if $use_local_file;
 }
 
 # Fetch latest data only if the local data is older than 8 minutes or
 # if the file doesn't exist.
-if ( ( not -e $file ) or
-     ( $file_mtime <
-       Time::Moment->now_utc->minus_minutes(8) ) or
-     $get_latest ) {
+if ( not -e $file
+         or $file_mtime < Time::Moment->now_utc->minus_minutes(8)
+         or $get_latest ) {
     require File::Fetch;
 
     # Fetch latest data from api.
@@ -85,16 +83,16 @@ if ( ( not -e $file ) or
     my $ff = File::Fetch->new(uri => $url);
 
     # Save the api response under /tmp.
-    $file = $ff->fetch( to => '/tmp' ) or
-        die $ff->error;
+    $file = $ff->fetch( to => '/tmp' )
+        or die $ff->error;
 }
 
 # Slurp api response to $file_data.
 my $file_data = path($file)->slurp;
 
 # Block further unveil calls.
-unveil() or
-    die "Unable to lock unveil: $!";
+unveil()
+    or die "Unable to lock unveil: $!";
 
 # Decode $file_data to $json_data.
 my $json_data = decode_json($file_data);
@@ -113,18 +111,21 @@ if ( $state_notes ) {
     @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
     $covid_19_data = Text::ASCIITable->new();
-    $covid_19_data->setCols( 'State',
-                             'Confirmed',
-                             'Active',
-                             'Recovered',
-                             'Deaths',
-                             'Last Updated',
-        );
+    $covid_19_data->setCols(
+        'State',
+        'Confirmed',
+        'Active',
+        'Recovered',
+        'Deaths',
+        'Last Updated',
+    );
 
-    $covid_19_data->alignCol( { 'Confirmed' => 'left',
-                                    'Recovered' => 'left',
-                                    'Deaths' => 'left',
-                              } );
+    $covid_19_data->alignCol( {
+        'Confirmed' => 'left',
+        'Recovered' => 'left',
+        'Deaths' => 'left',
+    } );
+
     $today = Time::Moment
         ->now_utc
         ->plus_hours(5)
@@ -133,38 +134,38 @@ if ( $state_notes ) {
 
 # Print all the rows if $rows_to_print evaluates to False or is
 # greater than the size of @$statewise or if user wants $state_notes.
-$rows_to_print = scalar @$statewise if
-    ( ( not $rows_to_print ) or
-      ( $rows_to_print > scalar @$statewise ) or
-      $state_notes );
+$rows_to_print = scalar @$statewise
+    if ( not $rows_to_print
+             or $rows_to_print > scalar @$statewise
+             or $state_notes );
 
 foreach my $i ( 0 ... $rows_to_print - 1  ) {
     my $state = $statewise->[$i]{state};
-    $state = "India" if
-        $state eq "Total";
+    $state = "India"
+        if $state eq "Total";
 
-    $state = $statewise->[$i]{statecode} if
-        length($state) > 16;
+    $state = $statewise->[$i]{statecode}
+        if length($state) > 16;
 
     if ( $state_notes ) {
         $notes_table->addRow(
             $state,
             $statewise->[$i]{statenotes},
-            ) unless
-            length($statewise->[$i]{statenotes}) == 0;
+        ) unless length($statewise->[$i]{statenotes}) == 0;
     } else {
         my $update_info;
         my $lastupdatedtime = $statewise->[$i]{lastupdatedtime};
         my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
 
         # Add $update_info.
-        if ( $last_update_dmy eq $today->strftime( "%d/%m/%Y" ) ) {
+        if ( $last_update_dmy
+                 eq $today->strftime( "%d/%m/%Y" ) ) {
             $update_info = "Today";
-        } elsif ( $last_update_dmy eq
-                  $today->minus_days(1)->strftime( "%d/%m/%Y" ) ) {
+        } elsif ( $last_update_dmy
+                      eq $today->minus_days(1)->strftime( "%d/%m/%Y" ) ) {
             $update_info = "Yesterday";
-        } elsif ( $last_update_dmy eq
-                  $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
+        } elsif ( $last_update_dmy
+                      eq $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
             $update_info = "Tomorrow"; # Hopefully we don't see this.
         } else {
             $update_info =
@@ -191,7 +192,7 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
             $recovered,
             $deaths,
             $update_info,
-            );
+        );
     }
 }
 
