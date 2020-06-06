@@ -139,7 +139,7 @@ foreach my $i (0...37) {
         $state,
         $statewise->[$i]{statenotes},
         ) unless
-        length($statewise->[$i]{statenotes}) eq 0;
+        length($statewise->[$i]{statenotes}) == 0;
 }
 
 # Generate tables.
