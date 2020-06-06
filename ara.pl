@@ -107,7 +107,7 @@ my ( $covid_19_data, $notes_table, @months, $today );
 if ( $state_notes ) {
     $notes_table = Text::ASCIITable->new( { drawRowLine => 1 } );
     $notes_table->setCols( qw( State Notes ) );
-    $notes_table->setColWidth( 'Notes', 84 );
+    $notes_table->setColWidth( 'Notes', 74 );
 } else {
     # Map month number to Months.
     @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
