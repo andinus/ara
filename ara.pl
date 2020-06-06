@@ -6,7 +6,6 @@ use feature 'say';
 
 use DateTime qw( );
 use Path::Tiny;
-use File::Fetch;
 use JSON::MaybeXS qw( decode_json );
 use Text::Table::Tiny qw( generate_table );
 use Text::ASCIITable;
@@ -52,6 +51,8 @@ if ( -e $file ) {
 if ( ( not -e $file ) or
      ( $file_mtime <
        DateTime->now( time_zone => 'Asia/Kolkata' )->subtract( minutes => 8 ) ) ) {
+    require File::Fetch;
+
     # Fetch latest data from api.
     my $url = 'https://api.covid19india.org/data.json';
     my $ff = File::Fetch->new(uri => $url);
