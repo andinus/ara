@@ -6,6 +6,7 @@ use feature 'say';
 
 use DateTime qw( );
 use Path::Tiny;
+use Time::Moment;
 use JSON::MaybeXS qw( decode_json );
 use Text::Table::Tiny qw( generate_table );
 use Text::ASCIITable;
@@ -40,17 +41,14 @@ my $file_mtime;
 # If $file exists then get mtime.
 if ( -e $file ) {
     my $file_stat = path($file)->stat;
-    $file_mtime = DateTime->from_epoch(
-        epoch => $file_stat->[9],
-        time_zone => 'Asia/Kolkata',
-        );
+    $file_mtime = Time::Moment->from_epoch( $file_stat->[9] );
 }
 
 # Fetch latest data only if the local data is older than 8 minutes or
 # if the file doesn't exist.
 if ( ( not -e $file ) or
      ( $file_mtime <
-       DateTime->now( time_zone => 'Asia/Kolkata' )->subtract( minutes => 8 ) ) ) {
+       Time::Moment->now_utc->minus_minutes(8) ) ) {
     require File::Fetch;
 
     # Fetch latest data from api.
