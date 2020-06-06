@@ -18,12 +18,13 @@ foreach my $path (@INC) {
         die "Unable to unveil: $!";
 }
 
-my ( $use_local_file, $get_latest, $state_notes );
+my ( $use_local_file, $get_latest, $state_notes, $rows_to_print );
 
 GetOptions(
     "local" => \$use_local_file,
     "latest" => \$get_latest,
     "notes" => \$state_notes,
+    "rows=i" => \$rows_to_print,
     ) or
     die "Error in command line arguments";
 
@@ -54,7 +55,7 @@ if ( -e $file ) {
     my $file_stat = path($file)->stat;
     $file_mtime = Time::Moment->from_epoch( $file_stat->[9] );
 } else {
-    die "File '$file' doesn't exist\n" if
+    warn "File '$file' doesn't exist\nFetching latest...\n" if
         $use_local_file;
 }
 
@@ -88,57 +89,44 @@ my $json_data = decode_json($file_data);
 # Get statewise information.
 my $statewise = $json_data->{statewise};
 
-# Map month number to Months.
-my @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
-my $covid_19_data = Text::ASCIITable->new();
-$covid_19_data->setCols( 'State',
-                         'Confirmed',
-                         'Active',
-                         'Recovered',
-                         'Deaths',
-                         'Last Updated',
-    );
+my ( $covid_19_data, $notes_table, @months, $today );
 
-$covid_19_data->alignCol( { 'Confirmed' => 'left',
-                                'Recovered' => 'left',
-                                'Deaths' => 'left',
-                          } );
-
-my $notes_table;
 if ( $state_notes ) {
     $notes_table = Text::ASCIITable->new( { drawRowLine => 1 } );
     $notes_table->setCols( qw( State Notes ) );
     $notes_table->setColWidth( 'Notes', 84 );
+} else {
+    # Map month number to Months.
+    @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+
+    $covid_19_data = Text::ASCIITable->new();
+    $covid_19_data->setCols( 'State',
+                             'Confirmed',
+                             'Active',
+                             'Recovered',
+                             'Deaths',
+                             'Last Updated',
+        );
+
+    $covid_19_data->alignCol( { 'Confirmed' => 'left',
+                                    'Recovered' => 'left',
+                                    'Deaths' => 'left',
+                              } );
+    $today = Time::Moment
+        ->now_utc
+        ->plus_hours(5)
+        ->plus_minutes(30); # Current time in 'Asia/Kolkata' TimeZone.
 }
 
-my $today = Time::Moment
-    ->now_utc
-    ->plus_hours(5)
-    ->plus_minutes(30); # Current time in 'Asia/Kolkata' TimeZone.
+# Print all the rows if $rows_to_print evaluates to False or is
+# greater than the size of @$statewise or if user wants $state_notes.
+$rows_to_print = scalar @$statewise if
+    ( ( not $rows_to_print ) or
+      ( $rows_to_print > scalar @$statewise ) or
+      $state_notes );
 
-# Add first 37 entries to $rows.
-foreach my $i (0...37) {
-    my $update_info;
-    my $lastupdatedtime = $statewise->[$i]{lastupdatedtime};
-    my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
-
-    # Add $update_info.
-    if ( $last_update_dmy eq $today->strftime( "%d/%m/%Y" ) ) {
-        $update_info = "Today";
-    } elsif ( $last_update_dmy eq
-              $today->minus_days(1)->strftime( "%d/%m/%Y" ) ) {
-        $update_info = "Yesterday";
-    } elsif ( $last_update_dmy eq
-              $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
-        $update_info = "Tomorrow"; # Hopefully we don't see this.
-    } else {
-        $update_info =
-            $months[substr( $lastupdatedtime, 3, 2 )] .
-            " " .
-            substr( $lastupdatedtime, 0, 2 );
-    }
-
+foreach my $i ( 0 ... $rows_to_print - 1  ) {
     my $state = $statewise->[$i]{state};
     $state = "India" if
         $state eq "Total";
@@ -146,36 +134,56 @@ foreach my $i (0...37) {
     $state = $statewise->[$i]{statecode} if
         length($state) > 16;
 
-    my $confirmed = "$statewise->[$i]{confirmed}";
-    my $recovered = "$statewise->[$i]{recovered}";
-    my $deaths = "$statewise->[$i]{deaths}";
+    if ( $state_notes ) {
+        $notes_table->addRow(
+            $state,
+            $statewise->[$i]{statenotes},
+            ) unless
+            length($statewise->[$i]{statenotes}) == 0;
+    } else {
+        my $update_info;
+        my $lastupdatedtime = $statewise->[$i]{lastupdatedtime};
+        my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
 
-    # Add delta only if it was updated Today.
-    if ( $update_info eq "Today" ) {
-        $confirmed .= " (+$statewise->[$i]{deltaconfirmed})";
-        $recovered .= " (+$statewise->[$i]{deltarecovered})";
-        $deaths .= " (+$statewise->[$i]{deltadeaths})";
+        # Add $update_info.
+        if ( $last_update_dmy eq $today->strftime( "%d/%m/%Y" ) ) {
+            $update_info = "Today";
+        } elsif ( $last_update_dmy eq
+                  $today->minus_days(1)->strftime( "%d/%m/%Y" ) ) {
+            $update_info = "Yesterday";
+        } elsif ( $last_update_dmy eq
+                  $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
+            $update_info = "Tomorrow"; # Hopefully we don't see this.
+        } else {
+            $update_info =
+                $months[substr( $lastupdatedtime, 3, 2 )] .
+                " " .
+                substr( $lastupdatedtime, 0, 2 );
+        }
+
+        my $confirmed = "$statewise->[$i]{confirmed}";
+        my $recovered = "$statewise->[$i]{recovered}";
+        my $deaths = "$statewise->[$i]{deaths}";
+
+        # Add delta only if it was updated Today.
+        if ( $update_info eq "Today" ) {
+            $confirmed .= " (+$statewise->[$i]{deltaconfirmed})";
+            $recovered .= " (+$statewise->[$i]{deltarecovered})";
+            $deaths .= " (+$statewise->[$i]{deltadeaths})";
+        }
+
+        $covid_19_data->addRow(
+            $state,
+            $confirmed,
+            $statewise->[$i]{active},
+            $recovered,
+            $deaths,
+            $update_info,
+            );
     }
-
-    $covid_19_data->addRow(
-        $state,
-        $confirmed,
-        $statewise->[$i]{active},
-        $recovered,
-        $deaths,
-        $update_info,
-        );
-
-    $notes_table->addRow(
-        $state,
-        $statewise->[$i]{statenotes},
-        ) unless
-        (
-         ( length($statewise->[$i]{statenotes}) == 0 ) or
-         ( not $state_notes ) );
 }
 
 # Generate tables.
-print $covid_19_data;
-print $notes_table if
-    $state_notes;
+$state_notes ?
+    print $notes_table :
+    print $covid_19_data;
