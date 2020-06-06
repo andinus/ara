@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use feature 'say';
 
-use DateTime qw( );
 use Path::Tiny;
 use Time::Moment;
 use JSON::MaybeXS qw( decode_json );
@@ -84,22 +83,25 @@ my $state_notes = Text::ASCIITable->new( { drawRowLine => 1 } );
 $state_notes->setCols( 'State', 'Notes' );
 $state_notes->setColWidth( 'Notes', 84 );
 
-my $today = DateTime->now( time_zone => 'Asia/Kolkata' );
+my $today = Time::Moment
+    ->now_utc
+    ->plus_hours(5)
+    ->plus_minutes(30); # Current time in 'Asia/Kolkata' TimeZone.
 
 # Add first 37 entries to $rows.
 foreach my $i (0...37) {
     my $update_info;
-    my $lastupdatedtime = $statewise->[$i]{'lastupdatedtime'};
+    my $lastupdatedtime = $statewise->[$i]{lastupdatedtime};
     my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
 
     # Add $update_info.
-    if ( $last_update_dmy eq $today->dmy('/') ) {
+    if ( $last_update_dmy eq $today->strftime( "%d/%m/%Y" ) ) {
         $update_info = "Today";
     } elsif ( $last_update_dmy eq
-              $today->clone->subtract( days => 1 )->dmy('/') ) {
+              $today->minus_days(1)->strftime( "%d/%m/%Y" ) ) {
         $update_info = "Yesterday";
     } elsif ( $last_update_dmy eq
-              $today->clone->add( days => 1 )->dmy('/') ) {
+              $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
         $update_info = "Tomorrow"; # Hopefully we don't see this.
     } else {
         $update_info =
@@ -108,11 +110,11 @@ foreach my $i (0...37) {
             substr( $lastupdatedtime, 0, 2 );
     }
 
-    my $state = $statewise->[$i]{'state'};
+    my $state = $statewise->[$i]{state};
     $state = "India" if
         $state eq "Total";
 
-    $state = $statewise->[$i]{'statecode'} if
+    $state = $statewise->[$i]{statecode} if
         length($state) > 16;
 
     my $confirmed = "$statewise->[$i]{confirmed}";
@@ -129,7 +131,7 @@ foreach my $i (0...37) {
     push @$covid_19_data, [
         $state,
         $confirmed,
-        $statewise->[$i]{'active'},
+        $statewise->[$i]{active},
         $recovered,
         $deaths,
         $update_info,
