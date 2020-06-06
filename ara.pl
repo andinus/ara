@@ -25,8 +25,20 @@ GetOptions(
     "latest" => \$get_latest,
     "notes" => \$state_notes,
     "rows=i" => \$rows_to_print,
+    "help" => sub { HelpMessage() },
     ) or
     die "Error in command line arguments";
+
+sub HelpMessage {
+    print "Options:
+    --local  Use local data
+    --latest Fetch latest data
+    --notes  Print State Notes
+    --rows=i Number of rows to print (i is Integer)
+    --help   Print this help message
+";
+    exit;
+}
 
 die "Can't use --local and --latest together\n" if
     ( $use_local_file and $get_latest );
