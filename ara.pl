@@ -180,7 +180,12 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
 
         # Add delta only if it was updated Today.
         if ( $update_info eq "Today" ) {
-            $confirmed .= " (+$statewise->[$i]{deltaconfirmed})";
+            if ( $statewise->[$i]{deltaconfirmed} >= 0 ) {
+                $confirmed .= " (+$statewise->[$i]{deltaconfirmed})";
+            } else {
+                $confirmed .= " ($statewise->[$i]{deltaconfirmed})";
+            }
+
             $recovered .= " (+$statewise->[$i]{deltarecovered})";
             $deaths .= " (+$statewise->[$i]{deltadeaths})";
         }
