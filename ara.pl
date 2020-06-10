@@ -61,12 +61,12 @@ foreach my $path ( sort keys %unveil ) {
 }
 
 my $file = '/tmp/data.json';
-my $file_mtime;
+my $file_ctime;
 
 # If $file exists then get mtime.
 if ( -e $file ) {
     my $file_stat = path($file)->stat;
-    $file_mtime = Time::Moment->from_epoch( $file_stat->[9] );
+    $file_ctime = Time::Moment->from_epoch( $file_stat->[10] );
 } else {
     warn "File '$file' doesn't exist\nFetching latest...\n"
         if $use_local_file;
@@ -75,7 +75,7 @@ if ( -e $file ) {
 # Fetch latest data only if the local data is older than 8 minutes or
 # if the file doesn't exist.
 if ( not -e $file
-         or $file_mtime < Time::Moment->now_utc->minus_minutes(8)
+         or $file_ctime < Time::Moment->now_utc->minus_minutes(8)
          or $get_latest ) {
     require HTTP::Tiny;
 
