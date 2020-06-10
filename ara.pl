@@ -76,15 +76,20 @@ if ( -e $file ) {
 if ( not -e $file
          or $file_mtime < Time::Moment->now_utc->minus_minutes(8)
          or $get_latest ) {
-    require File::Fetch;
+    require HTTP::Tiny;
 
     # Fetch latest data from api.
     my $url = 'https://api.covid19india.org/data.json';
-    my $ff = File::Fetch->new(uri => $url);
 
-    # Save the api response under /tmp.
-    $file = $ff->fetch( to => '/tmp' )
-        or die $ff->error;
+    my $response = HTTP::Tiny
+        ->new( verify_SSL => 1 )
+        ->mirror($url, $file);
+
+    die "Failed to fetch latest data...
+Reason: $response->{reason}\n
+Content: $response->{content}
+Status: $response->{status}\n"
+        unless $response->{success};
 }
 
 # Slurp api response to $file_data.
