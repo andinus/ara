@@ -17,23 +17,25 @@ foreach my $path (@INC) {
         or die "Unable to unveil: $!";
 }
 
-my ( $use_local_file, $get_latest, $state_notes, $rows_to_print );
+my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta );
 
 GetOptions(
     "local" => \$use_local_file,
     "latest" => \$get_latest,
     "notes" => \$state_notes,
     "rows=i" => \$rows_to_print,
+    "nodelta" => \$no_delta,
     "help" => sub { HelpMessage() },
 ) or die "Error in command line arguments";
 
 sub HelpMessage {
     print "Options:
-    --local  Use local data
-    --latest Fetch latest data
-    --notes  Print State Notes
-    --rows=i Number of rows to print (i is Integer)
-    --help   Print this help message
+    --local   Use local data
+    --latest  Fetch latest data
+    --notes   Print State Notes
+    --rows=i  Number of rows to print (i is Integer)
+    --nodelta Don't print changes in values
+    --help    Print this help message
 ";
     exit;
 }
@@ -187,7 +189,8 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
         my $deaths = "$statewise->[$i]{deaths}";
 
         # Add delta only if it was updated Today.
-        if ( $update_info eq "Today" ) {
+        if ( $update_info eq "Today"
+                 and not $no_delta ) {
             $confirmed .= sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
             $recovered .= sprintf " (%+d)", $statewise->[$i]{deltarecovered};
             $deaths .= sprintf " (%+d)", $statewise->[$i]{deltadeaths};
