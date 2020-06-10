@@ -186,14 +186,9 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
 
         # Add delta only if it was updated Today.
         if ( $update_info eq "Today" ) {
-            if ( $statewise->[$i]{deltaconfirmed} >= 0 ) {
-                $confirmed .= " (+$statewise->[$i]{deltaconfirmed})";
-            } else {
-                $confirmed .= " ($statewise->[$i]{deltaconfirmed})";
-            }
-
-            $recovered .= " (+$statewise->[$i]{deltarecovered})";
-            $deaths .= " (+$statewise->[$i]{deltadeaths})";
+            $confirmed .= sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+            $recovered .= sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+            $deaths .= sprintf " (%+d)", $statewise->[$i]{deltadeaths};
         }
 
         $covid_19_data->addRow(
