@@ -66,7 +66,7 @@ my $file_ctime;
 # If $file exists then get mtime.
 if ( -e $file ) {
     my $file_stat = path($file)->stat;
-    $file_ctime = Time::Moment->from_epoch( $file_stat->[10] );
+    $file_ctime = Time::Moment->from_epoch( $file_stat->ctime );
 } else {
     warn "File '$file' doesn't exist\nFetching latest...\n"
         if $use_local_file;
