@@ -43,9 +43,10 @@ die "Can't use --local and --latest together\n"
 
 # %unveil contains list of paths to unveil with their permissions.
 my %unveil = (
-    "/" => "rx", # Unveil "/", remove this later after profiling with
-                 # ktrace.
-    "/home" => "", # Veil "/home", we don't want to read it.
+    "/usr" => "rx",
+    "/var" => "rx",
+    "/etc" => "rx",
+    "/dev" => "rx",
     "/tmp" => "rwc",
     "/dev/null" => "rw",
 );
