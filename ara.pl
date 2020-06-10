@@ -9,7 +9,13 @@ use Text::ASCIITable;
 use Getopt::Long qw( GetOptions );
 use JSON::MaybeXS qw( decode_json );
 
-use OpenBSD::Unveil;
+use constant is_OpenBSD => $^O eq "openbsd";
+if (is_OpenBSD) {
+    require OpenBSD::Unveil;
+    OpenBSD::Unveil->import;
+} else {
+    sub unveil { return 1; }
+}
 
 # Unveil @INC.
 foreach my $path (@INC) {
