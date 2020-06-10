@@ -41,29 +41,31 @@ sub HelpMessage {
 die "Can't use --local and --latest together\n"
     if $use_local_file and $get_latest ;
 
+my $cache_dir = $ENV{XDG_CACHE_HOME} || "$ENV{HOME}/.cache";
+
 # %unveil contains list of paths to unveil with their permissions.
 my %unveil = (
     "/usr" => "rx",
     "/var" => "rx",
     "/etc" => "rx",
     "/dev" => "rx",
-    "/tmp" => "rwc",
-    "/dev/null" => "rw",
+    # Unveil the whole cache directory because HTTP::Tiny fetches file
+    # like ara.jsonXXXXXXXXXX where each 'X' is a random number.
+    $cache_dir => "rwc",
 );
 
 # Unveil each path from %unveil.
 keys %unveil;
-
 # We use sort because otherwise keys is random order everytime.
 foreach my $path ( sort keys %unveil ) {
     unveil( $path, $unveil{$path} )
         or die "Unable to unveil: $!";
 }
 
-my $file = '/tmp/data.json';
+my $file = "$cache_dir/ara.json";
 my $file_ctime;
 
-# If $file exists then get mtime.
+# If $file exists then get ctime.
 if ( -e $file ) {
     my $file_stat = path($file)->stat;
     $file_ctime = Time::Moment->from_epoch( $file_stat->ctime );
