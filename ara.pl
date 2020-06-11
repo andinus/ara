@@ -10,11 +10,14 @@ use Getopt::Long qw( GetOptions );
 use JSON::MaybeXS qw( decode_json );
 
 use constant is_OpenBSD => $^O eq "openbsd";
-if (is_OpenBSD) {
-    require OpenBSD::Unveil;
-    OpenBSD::Unveil->import;
-} else {
-    sub unveil { return 1; }
+require OpenBSD::Unveil
+    if is_OpenBSD;
+sub unveil {
+    if (is_OpenBSD) {
+        return OpenBSD::Unveil::unveil(@_);
+    } else {
+        return 1;
+    }
 }
 
 # Unveil @INC.
