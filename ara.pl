@@ -8,6 +8,7 @@ use Time::Moment;
 use Text::ASCIITable;
 use Getopt::Long qw( GetOptions );
 use JSON::MaybeXS qw( decode_json );
+use Term::ANSIColor qw( :pushpop ) ;
 
 use constant is_OpenBSD => $^O eq "openbsd";
 require OpenBSD::Unveil
@@ -38,12 +39,13 @@ GetOptions(
 ) or die "Error in command line arguments";
 
 sub HelpMessage {
-    print "Options:
+    print LOCALCOLOR GREEN "Options:
     --local   Use local data
     --latest  Fetch latest data
     --notes   Print State Notes
     --rows=i  Number of rows to print (i is Integer)
-    --nodelta Don't print changes in values
+    --nodelta Don't print changes in values";
+    print LOCALCOLOR CYAN "
     --help    Print this help message
 ";
     exit;
@@ -129,7 +131,7 @@ if ( $state_notes ) {
     # Map month number to Months.
     @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
-    $covid_19_data = Text::ASCIITable->new();
+    $covid_19_data = Text::ASCIITable->new( { allowANSI => 1 } );
     $covid_19_data->setCols(
         'State',
         'Confirmed',
@@ -179,15 +181,18 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
         # Add $update_info.
         if ( $last_update_dmy
                  eq $today->strftime( "%d/%m/%Y" ) ) {
-            $update_info = "Today";
+            $update_info = "Today"; # Don't add color here because the
+                                    # next if statement will eval to
+                                    # false everytime.
         } elsif ( $last_update_dmy
                       eq $today->minus_days(1)->strftime( "%d/%m/%Y" ) ) {
-            $update_info = "Yesterday";
+            $update_info = LOCALCOLOR CYAN "Yesterday";
         } elsif ( $last_update_dmy
                       eq $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
-            $update_info = "Tomorrow"; # Hopefully we don't see this.
+            $update_info = LOCALCOLOR RED
+                "Tomorrow"; # Hopefully we don't see this.
         } else {
-            $update_info =
+            $update_info = LOCALCOLOR YELLOW
                 $months[substr( $lastupdatedtime, 3, 2 )] .
                 " " .
                 substr( $lastupdatedtime, 0, 2 );
@@ -200,9 +205,40 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
         # Add delta only if it was updated Today.
         if ( $update_info eq "Today"
                  and not $no_delta ) {
-            $confirmed .= sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
-            $recovered .= sprintf " (%+d)", $statewise->[$i]{deltarecovered};
-            $deaths .= sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+            my $delta_confirmed = $statewise->[$i]{deltaconfirmed};
+            if ( $delta_confirmed > 1000 ) {
+                $confirmed .= LOCALCOLOR BRIGHT_MAGENTA
+                    sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+            } elsif ( $delta_confirmed > 500 ) {
+                $confirmed .= LOCALCOLOR MAGENTA
+                    sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+            } else {
+                $confirmed .= sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+            }
+
+            my $delta_recovered = $statewise->[$i]{deltarecovered};
+            if ( $delta_recovered > 1000 ) {
+                $recovered .= LOCALCOLOR BRIGHT_GREEN
+                    sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+            } elsif ( $delta_recovered > 500 ) {
+                $recovered .= LOCALCOLOR GREEN
+                    sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+            } else {
+                $recovered .= sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+            }
+
+            my $delta_deaths = $statewise->[$i]{deltadeaths};
+            if ( $delta_deaths > 100 ) {
+                $state = LOCALCOLOR BLACK ON_RED $state;
+                $deaths .= LOCALCOLOR BRIGHT_RED
+                    sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+            } elsif ( $delta_deaths > 50 ) {
+                $state = LOCALCOLOR RED $state;
+                $deaths .= LOCALCOLOR RED
+                    sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+            } else {
+                $deaths .= sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+            }
         }
 
         $covid_19_data->addRow(
@@ -211,7 +247,7 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
             $statewise->[$i]{active},
             $recovered,
             $deaths,
-            $update_info,
+            LOCALCOLOR GREEN $update_info,
         );
     }
 }
