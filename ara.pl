@@ -119,6 +119,7 @@ if ( not $use_local_file
                or $get_latest ) ) {
     require HTTP::Simple;
 
+    # Ignore a warning, next line would've printed a warning.
     no warnings 'once';
     $HTTP::Simple::UA->verify_SSL(1);
 
