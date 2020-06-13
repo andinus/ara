@@ -95,9 +95,8 @@ my %unveil = (
     $cache_dir => "rwc",
 );
 
-# Unveil each path from %unveil.
-keys %unveil;
-# We use sort because otherwise keys is random order everytime.
+# Unveil each path from %unveil. We use sort because otherwise keys is
+# random order everytime.
 foreach my $path ( sort keys %unveil ) {
     unveil( $path, $unveil{$path} )
         or die "Unable to unveil: $!";
