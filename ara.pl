@@ -171,14 +171,13 @@ if ( $state_notes ) {
         ->plus_minutes(30); # Current time in 'Asia/Kolkata' TimeZone.
 }
 
-# Print all the rows if $rows_to_print evaluates to False or is
-# greater than the size of @$statewise or if user wants $state_notes.
-$rows_to_print = scalar @$statewise
-    if ( not $rows_to_print
-             or $rows_to_print > scalar @$statewise
-             or $state_notes );
+my $rows_printed = 0;
+foreach my $i ( 0 ... scalar @$statewise - 1 ) {
+    # $rows_printed is incremented at the end of this foreach loop.
+    if ( $rows_to_print ) {
+        last if $rows_printed == $rows_to_print;
+    }
 
-foreach my $i ( 0 ... $rows_to_print - 1  ) {
     my $state = $statewise->[$i]{state};
 
     $state = "India"
@@ -286,6 +285,7 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
             $update_info,
         );
     }
+    $rows_printed++;
 }
 
 # Generate tables.
