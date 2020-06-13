@@ -181,18 +181,15 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
         # Add $update_info.
         if ( $last_update_dmy
                  eq $today->strftime( "%d/%m/%Y" ) ) {
-            $update_info = "Today"; # Don't add color here because the
-                                    # next if statement will eval to
-                                    # false everytime.
+            $update_info = "Today";
         } elsif ( $last_update_dmy
                       eq $today->minus_days(1)->strftime( "%d/%m/%Y" ) ) {
-            $update_info = LOCALCOLOR CYAN "Yesterday";
+            $update_info = "Yesterday";
         } elsif ( $last_update_dmy
                       eq $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
-            $update_info = LOCALCOLOR RED
-                "Tomorrow"; # Hopefully we don't see this.
+            $update_info = "Tomorrow"; # Hopefully we don't see this.
         } else {
-            $update_info = LOCALCOLOR YELLOW
+            $update_info =
                 $months[substr( $lastupdatedtime, 3, 2 )] .
                 " " .
                 substr( $lastupdatedtime, 0, 2 );
@@ -247,7 +244,7 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
             $statewise->[$i]{active},
             $recovered,
             $deaths,
-            LOCALCOLOR GREEN $update_info,
+            $update_info,
         );
     }
 }
