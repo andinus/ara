@@ -28,7 +28,7 @@ foreach my $path (@INC) {
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
-     $no_total, @to_hide );
+     $no_total, @to_hide, %hide );
 
 GetOptions(
     "local" => \$use_local_file,
@@ -49,7 +49,6 @@ push @to_hide, "india"
 # Creating %hide and undefining all %hash{@to_hide}, after this we
 # check if %hash{@to_hide} exists with exists keyword. Read this as
 # "undef these keys from the hash". https://perldoc.pl/perldata#Slices
-my %hide;
 undef @hide{ @to_hide }
     if scalar @to_hide; # Array can't be empty, will fail.
                         # Alternatively can do @hide{ @to_hide } = ()
