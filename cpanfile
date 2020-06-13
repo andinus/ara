@@ -4,6 +4,7 @@ requires 'HTTP::Tiny', '0.076';
 requires 'JSON::MaybeXS', '1.004002';
 requires 'Text::ASCIITable', '0.22';
 requires 'Getopt::Long', '2.5';
+requires 'Term::ANSIColor', '5.01';
 
 requires 'IO::Socket::SSL', '1.42'
     or 'Net::SSLeay', '1.49';
