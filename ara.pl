@@ -54,6 +54,10 @@ undef @hide{ @to_hide }
                         # Alternatively can do @hide{ @to_hide } = ()
                         # which will work even if @to_hide is empty.
 
+# Warn when user tries to hide these columns.
+warn LOCALCOLOR RED "Cannot hide state column" if exists $hide{state};
+warn LOCALCOLOR RED "Cannot hide notes column" if exists $hide{notes};
+
 sub HelpMessage {
     print LOCALCOLOR GREEN "Options:
     --local   Use local data
@@ -62,7 +66,7 @@ sub HelpMessage {
     --rows=i  Number of rows to print (i is Integer)
     --nodelta Don't print changes in values
     --nototal Don't print 'Total' row
-    --hide    Hide states from table (space seperated values)";
+    --hide    Hide states, columns from table (space seperated values)";
     print LOCALCOLOR CYAN "
     --help    Print this help message
 ";
@@ -149,21 +153,23 @@ if ( $state_notes ) {
     # Map month number to Months.
     @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
-    $covid_19_data = Text::ASCIITable->new( { allowANSI => 1 } );
-    $covid_19_data->setCols(
-        'State',
-        'Confirmed',
-        'Active',
-        'Recovered',
-        'Deaths',
-        'Last Updated',
-    );
+    my @columns;
+    push @columns, 'State'; # User cannot hide state column.
+    push @columns, 'Confirmed' unless exists $hide{confirmed};
+    push @columns, 'Active' unless exists $hide{active};
+    push @columns, 'Recovered' unless exists $hide{recovered};
+    push @columns, 'Deaths' unless exists $hide{deaths};
+    push @columns, 'Last Updated' unless exists $hide{'last updated'};
 
-    $covid_19_data->alignCol( {
-        'Confirmed' => 'left',
-        'Recovered' => 'left',
-        'Deaths' => 'left',
-    } );
+    $covid_19_data = Text::ASCIITable->new( { allowANSI => 1 } );
+    $covid_19_data->setCols( @columns );
+
+    my %alignment;
+    $alignment{Confirmed} = "left" unless exists $hide{confirmed};
+    $alignment{Recovered} = "left" unless exists $hide{recovered};
+    $alignment{Deaths} = "left" unless exists $hide{deaths};
+
+    $covid_19_data->alignCol( \%alignment );
 
     $today = Time::Moment
         ->now_utc
@@ -276,14 +282,15 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
             }
         }
 
-        $covid_19_data->addRow(
-            $state,
-            $confirmed,
-            $statewise->[$i]{active},
-            $recovered,
-            $deaths,
-            $update_info,
-        );
+        my @row;
+        push @row, $state;
+        push @row, $confirmed unless exists $hide{confirmed};
+        push @row, $statewise->[$i]{active} unless exists $hide{active};
+        push @row, $recovered unless exists $hide{recovered};
+        push @row, $deaths unless exists $hide{deaths};
+        push @row, $update_info unless exists $hide{'last updated'};
+
+        $covid_19_data->addRow( @row );
     }
     $rows_printed++;
 }
