@@ -54,6 +54,11 @@ undef @hide{ @to_hide }
                         # Alternatively can do @hide{ @to_hide } = ()
                         # which will work even if @to_hide is empty.
 
+# Alias updated to last updated. This will allow user to just enter
+# updated in hide option.
+undef $hide{'last updated'}
+    if exists $hide{updated};
+
 # Warn when user tries to hide these columns.
 warn LOCALCOLOR RED "Cannot hide state column" if exists $hide{state};
 warn LOCALCOLOR RED "Cannot hide notes column" if exists $hide{notes};
