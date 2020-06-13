@@ -28,7 +28,7 @@ foreach my $path (@INC) {
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
-     $no_total );
+     $no_total, @to_hide );
 
 GetOptions(
     "local" => \$use_local_file,
@@ -37,8 +37,23 @@ GetOptions(
     "rows=i" => \$rows_to_print,
     "nodelta" => \$no_delta,
     "nototal" => \$no_total,
-    "help" => sub { HelpMessage() },
+    "hide=s{1,}" => \@to_hide, # Getopt::Long docs say that this is an
+                               # experimental feature with a warning.
+    "help", "h" => sub { HelpMessage() },
 ) or die "Error in command line arguments";
+
+# To not break --nototal we add "India" to @to_hide.
+push @to_hide, "india"
+    if $no_total;
+
+# Creating %hide and undefining all %hash{@to_hide}, after this we
+# check if %hash{@to_hide} exists with exists keyword. Read this as
+# "undef these keys from the hash". https://perldoc.pl/perldata#Slices
+my %hide;
+undef @hide{ @to_hide }
+    if scalar @to_hide; # Array can't be empty, will fail.
+                        # Alternatively can do @hide{ @to_hide } = ()
+                        # which will work even if @to_hide is empty.
 
 sub HelpMessage {
     print LOCALCOLOR GREEN "Options:
@@ -47,7 +62,8 @@ sub HelpMessage {
     --notes   Print State Notes
     --rows=i  Number of rows to print (i is Integer)
     --nodelta Don't print changes in values
-    --nototal Don't print 'Total' row";
+    --nototal Don't print 'Total' row
+    --hide    Hide states from table (space seperated values)";
     print LOCALCOLOR CYAN "
     --help    Print this help message
 ";
@@ -165,12 +181,11 @@ $rows_to_print = scalar @$statewise
 
 foreach my $i ( 0 ... $rows_to_print - 1  ) {
     my $state = $statewise->[$i]{state};
-    next
-        if $no_total
-        and $state eq "Total";
-
     $state = "India"
         if $state eq "Total";
+
+    next
+        if exists $hide{lc $state};
 
     $state = $statewise->[$i]{statecode}
         if length($state) > 16;
