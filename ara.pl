@@ -27,7 +27,8 @@ foreach my $path (@INC) {
         or die "Unable to unveil: $!";
 }
 
-my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta );
+my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
+     $no_total );
 
 GetOptions(
     "local" => \$use_local_file,
@@ -35,6 +36,7 @@ GetOptions(
     "notes" => \$state_notes,
     "rows=i" => \$rows_to_print,
     "nodelta" => \$no_delta,
+    "nototal" => \$no_total,
     "help" => sub { HelpMessage() },
 ) or die "Error in command line arguments";
 
@@ -44,7 +46,8 @@ sub HelpMessage {
     --latest  Fetch latest data
     --notes   Print State Notes
     --rows=i  Number of rows to print (i is Integer)
-    --nodelta Don't print changes in values";
+    --nodelta Don't print changes in values
+    --nototal Don't print 'Total' row";
     print LOCALCOLOR CYAN "
     --help    Print this help message
 ";
@@ -162,6 +165,10 @@ $rows_to_print = scalar @$statewise
 
 foreach my $i ( 0 ... $rows_to_print - 1  ) {
     my $state = $statewise->[$i]{state};
+    next
+        if $no_total
+        and $state eq "Total";
+
     $state = "India"
         if $state eq "Total";
 
