@@ -61,7 +61,8 @@ undef $hide{'last updated'}
 
 # Warn when user tries to hide these columns.
 warn LOCALCOLOR RED "Cannot hide state column" if exists $hide{state};
-warn LOCALCOLOR RED "Cannot hide notes column" if exists $hide{notes};
+warn LOCALCOLOR RED "Cannot hide notes column"
+    if exists $hide{notes} and $state_notes;
 
 sub HelpMessage {
     print LOCALCOLOR GREEN "Options:
