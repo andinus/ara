@@ -204,9 +204,12 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
                  and not $no_delta ) {
             my $delta_confirmed = $statewise->[$i]{deltaconfirmed};
             if ( $delta_confirmed > 1000 ) {
+                $confirmed .= LOCALCOLOR ON_MAGENTA
+                    sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+            } elsif ( $delta_confirmed > 500  ) {
                 $confirmed .= LOCALCOLOR BRIGHT_MAGENTA
                     sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
-            } elsif ( $delta_confirmed > 500 ) {
+            } elsif ( $delta_confirmed > 100 ) {
                 $confirmed .= LOCALCOLOR MAGENTA
                     sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
             } else {
@@ -215,9 +218,12 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
 
             my $delta_recovered = $statewise->[$i]{deltarecovered};
             if ( $delta_recovered > 1000 ) {
-                $recovered .= LOCALCOLOR BRIGHT_GREEN
+                $recovered .= LOCALCOLOR ON_GREEN
                     sprintf " (%+d)", $statewise->[$i]{deltarecovered};
             } elsif ( $delta_recovered > 500 ) {
+                $recovered .= LOCALCOLOR BRIGHT_GREEN
+                    sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+            } elsif ( $delta_recovered > 100 ) {
                 $recovered .= LOCALCOLOR GREEN
                     sprintf " (%+d)", $statewise->[$i]{deltarecovered};
             } else {
@@ -226,10 +232,14 @@ foreach my $i ( 0 ... $rows_to_print - 1  ) {
 
             my $delta_deaths = $statewise->[$i]{deltadeaths};
             if ( $delta_deaths > 100 ) {
-                $state = LOCALCOLOR BLACK ON_RED $state;
-                $deaths .= LOCALCOLOR BRIGHT_RED
+                $state = LOCALCOLOR ON_RED $state;
+                $deaths .= LOCALCOLOR ON_RED
                     sprintf " (%+d)", $statewise->[$i]{deltadeaths};
             } elsif ( $delta_deaths > 50 ) {
+                $state = LOCALCOLOR BRIGHT_RED $state;
+                $deaths .= LOCALCOLOR BRIGHT_RED
+                    sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+            } elsif ( $delta_deaths > 25 ) {
                 $state = LOCALCOLOR RED $state;
                 $deaths .= LOCALCOLOR RED
                     sprintf " (%+d)", $statewise->[$i]{deltadeaths};
