@@ -98,12 +98,12 @@ foreach my $path ( sort keys %unveil ) {
 }
 
 my $file = "$cache_dir/ara.json";
-my $file_ctime;
+my $file_mtime;
 
 # If $file exists then get ctime.
 if ( -e $file ) {
     my $file_stat = path($file)->stat;
-    $file_ctime = Time::Moment->from_epoch( $file_stat->ctime );
+    $file_mtime = Time::Moment->from_epoch( $file_stat->mtime );
 } else {
     warn "File '$file' doesn't exist\nFetching latest...\n"
         if $use_local_file;
@@ -112,22 +112,23 @@ if ( -e $file ) {
 # Fetch latest data only if the local data is older than 8 minutes or
 # if the file doesn't exist.
 if ( not -e $file
-         or $file_ctime < Time::Moment->now_utc->minus_minutes(8)
+         or $file_mtime < Time::Moment->now_utc->minus_minutes(8)
          or $get_latest ) {
-    require HTTP::Tiny;
+    require HTTP::Simple;
+
+    no warnings 'once';
+    $HTTP::Simple::UA->verify_SSL(1);
 
     # Fetch latest data from api.
     my $url = 'https://api.covid19india.org/data.json';
 
-    my $response = HTTP::Tiny
-        ->new( verify_SSL => 1 )
-        ->mirror($url, $file);
+    my $response = HTTP::Simple::getstore($url, $file);
 
     die "Failed to fetch latest data...
 Reason: $response->{reason}\n
 Content: $response->{content}
 Status: $response->{status}\n"
-        unless $response->{success};
+        unless HTTP::Simple::is_success($response);
 }
 
 # Slurp api response to $file_data.
