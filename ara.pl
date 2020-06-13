@@ -181,14 +181,22 @@ $rows_to_print = scalar @$statewise
 
 foreach my $i ( 0 ... $rows_to_print - 1  ) {
     my $state = $statewise->[$i]{state};
+
     $state = "India"
         if $state eq "Total";
 
+    $state = "Unassigned"
+        if $state eq "State Unassigned";
+
     next
-        if exists $hide{lc $state};
+        if exists $hide{lc $state}
+        # User sees the statecode if length $state > 16 so we also
+        # match against that.
+        or ( length $state > 16
+             and exists $hide{lc $statewise->[$i]{statecode}});
 
     $state = $statewise->[$i]{statecode}
-        if length($state) > 16;
+        if length $state > 16;
 
     if ( $state_notes ) {
         $notes_table->addRow(
