@@ -248,7 +248,7 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
                  and not $no_delta ) {
             my $delta_confirmed = $statewise->[$i]{deltaconfirmed};
             if ( $delta_confirmed > 1000 ) {
-                $confirmed .= LOCALCOLOR ON_MAGENTA
+                $confirmed .= LOCALCOLOR BLACK ON_MAGENTA
                     sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
             } elsif ( $delta_confirmed > 500  ) {
                 $confirmed .= LOCALCOLOR BRIGHT_MAGENTA
@@ -262,7 +262,7 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
 
             my $delta_recovered = $statewise->[$i]{deltarecovered};
             if ( $delta_recovered > 1000 ) {
-                $recovered .= LOCALCOLOR ON_GREEN
+                $recovered .= LOCALCOLOR BLACK ON_GREEN
                     sprintf " (%+d)", $statewise->[$i]{deltarecovered};
             } elsif ( $delta_recovered > 500 ) {
                 $recovered .= LOCALCOLOR BRIGHT_GREEN
@@ -276,8 +276,8 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
 
             my $delta_deaths = $statewise->[$i]{deltadeaths};
             if ( $delta_deaths > 100 ) {
-                $state = LOCALCOLOR ON_RED $state;
-                $deaths .= LOCALCOLOR ON_RED
+                $state = LOCALCOLOR BLACK ON_RED $state;
+                $deaths .= LOCALCOLOR BLACK ON_RED
                     sprintf " (%+d)", $statewise->[$i]{deltadeaths};
             } elsif ( $delta_deaths > 50 ) {
                 $state = LOCALCOLOR BRIGHT_RED $state;
