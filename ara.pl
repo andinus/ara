@@ -45,7 +45,7 @@ GetOptions(
 
 if ( $use_local_file
          and $get_latest ) {
-    warn LOCALCOLOR RED "Cannot use --local & --latest together
+    warn LOCALCOLOR YELLOW "Cannot use --local & --latest together
 Overriding --latest option";
     undef $get_latest;
 }
@@ -71,8 +71,8 @@ undef $hide{'last updated'}
     if exists $hide{updated};
 
 # Warn when user tries to hide these columns.
-warn LOCALCOLOR RED "Cannot hide state column" if exists $hide{state};
-warn LOCALCOLOR RED "Cannot hide notes column"
+warn LOCALCOLOR YELLOW "Cannot hide state column" if exists $hide{state};
+warn LOCALCOLOR YELLOW "Cannot hide notes column"
     if exists $hide{notes} and $state_notes;
 
 sub HelpMessage {
@@ -120,7 +120,8 @@ if ( -e $file ) {
     $file_mtime = Time::Moment->from_epoch( $file_stat->mtime );
 } else {
     if ( $use_local_file ) {
-        warn "File '$file' doesn't exist\nFetching latest...\n";
+        warn LOCALCOLOR YELLOW "File '$file' doesn't exist
+Fetching latest...";
         undef $use_local_file;
     }
 }
