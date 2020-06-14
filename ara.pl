@@ -31,6 +31,23 @@ foreach my $path (@INC) {
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
      $no_total, @to_hide, %hide, @to_show, %show, $no_words );
 
+sub HelpMessage {
+    print LOCALCOLOR GREEN "Options:
+    --local   Use local data
+    --latest  Fetch latest data
+    --notes   Print State Notes
+    --rows=i  Number of rows to print (i is Integer)
+    --nodelta Don't print changes in values
+    --nototal Don't print 'Total' row
+    --nowords Don't format numbers with words
+    --hide    Hide states, columns from table (space seperated)
+    --show    Show only these states (space seperated)";
+    print LOCALCOLOR CYAN "
+    --help    Print this help message
+";
+    exit;
+}
+
 GetOptions(
     "local" => \$use_local_file,
     "latest" => \$get_latest,
@@ -76,23 +93,6 @@ undef $hide{'last updated'}
 warn LOCALCOLOR YELLOW "Cannot hide state column" if exists $hide{state};
 warn LOCALCOLOR YELLOW "Cannot hide notes column"
     if exists $hide{notes} and $state_notes;
-
-sub HelpMessage {
-    print LOCALCOLOR GREEN "Options:
-    --local   Use local data
-    --latest  Fetch latest data
-    --notes   Print State Notes
-    --rows=i  Number of rows to print (i is Integer)
-    --nodelta Don't print changes in values
-    --nototal Don't print 'Total' row
-    --nowords Don't format numbers with words
-    --hide    Hide states, columns from table (space seperated)
-    --show    Show only these states (space seperated)";
-    print LOCALCOLOR CYAN "
-    --help    Print this help message
-";
-    exit;
-}
 
 my $cache_dir = $ENV{XDG_CACHE_HOME} || "$ENV{HOME}/.cache";
 
@@ -226,7 +226,7 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
         next
             unless exists $show{lc $state}
             or ( length $state > 16
-                 and exists $show{lc $statewise->[$i]{statecode}})
+                 and exists $show{lc $statewise->[$i]{statecode}});
     } else {
         next
             if exists $hide{lc $state}
