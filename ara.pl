@@ -8,7 +8,7 @@ use Time::Moment;
 use Text::ASCIITable;
 use Getopt::Long qw( GetOptions );
 use JSON::MaybeXS qw( decode_json );
-use Term::ANSIColor qw( :pushpop ) ;
+use Term::ANSIColor qw( :pushpop );
 
 use constant is_OpenBSD => $^O eq "openbsd";
 require OpenBSD::Unveil
@@ -41,6 +41,13 @@ GetOptions(
                                # experimental feature with a warning.
     "help", "h" => sub { HelpMessage() },
 ) or die "Error in command line arguments";
+
+if ( $use_local_file
+         and $get_latest ) {
+    warn LOCALCOLOR RED "Cannot use --local & --latest together
+Overriding --latest option";
+    undef $get_latest;
+}
 
 # To not break --nototal we add "India" to @to_hide.
 push @to_hide, "india"
@@ -78,9 +85,6 @@ sub HelpMessage {
 ";
     exit;
 }
-
-die "Can't use --local and --latest together\n"
-    if $use_local_file and $get_latest ;
 
 my $cache_dir = $ENV{XDG_CACHE_HOME} || "$ENV{HOME}/.cache";
 
