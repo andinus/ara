@@ -18,4 +18,7 @@ only prints India's Covid stats.
 *Note* (OpenBSD users): If you're using a custom Perl install then add the
 path to =OpenBSD::= in @INC.
 
-*Demo Video*: [[https://diode.zone/videos/watch/03be044d-6ab7-4f01-8769-0084674dec93][Ara 2020-06-06]]
+| Demo Videos    |
+|----------------|
+| [[https://diode.zone/videos/watch/95868534-8aae-497b-806e-5766236bb058][Ara 2020-06-14]] |
+| [[https://diode.zone/videos/watch/03be044d-6ab7-4f01-8769-0084674dec93][Ara 2020-06-06]] |
