@@ -324,6 +324,9 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
     $rows_printed++;
 }
 
+die LOCALCOLOR RED "No rows in table"
+    unless $rows_printed;
+
 # Generate tables.
 if ( $state_notes ) {
     print $notes_table;
