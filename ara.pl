@@ -29,7 +29,7 @@ foreach my $path (@INC) {
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
-     $no_total, @to_hide, %hide, @to_show, %show );
+     $no_total, @to_hide, %hide, @to_show, %show, $no_words );
 
 GetOptions(
     "local" => \$use_local_file,
@@ -38,6 +38,7 @@ GetOptions(
     "rows=i" => \$rows_to_print,
     "nodelta" => \$no_delta,
     "nototal" => \$no_total,
+    "nowords" => \$no_words,
     "hide=s{1,}" => \@to_hide, # Getopt::Long docs say that this is an
                                # experimental feature with a warning.
     "show=s{1,}" => \@to_show,
@@ -84,6 +85,7 @@ sub HelpMessage {
     --rows=i  Number of rows to print (i is Integer)
     --nodelta Don't print changes in values
     --nototal Don't print 'Total' row
+    --nowords Don't format numbers with words
     --hide    Hide states, columns from table (space seperated)
     --show    Show only these states (space seperated)";
     print LOCALCOLOR CYAN "
@@ -198,10 +200,10 @@ if ( $state_notes ) {
         ->plus_minutes(30); # Current time in 'Asia/Kolkata' TimeZone.
 }
 
-my $fmt = Number::Format::SouthAsian->new(
-    words => 1,
-    decimals => 2
-);
+my %format_with_words;
+%format_with_words = ( words => 1, decimals => 2 )
+    unless $no_words;
+my $fmt = Number::Format::SouthAsian->new( %format_with_words );
 
 my $rows_printed = 0;
 foreach my $i ( 0 ... scalar @$statewise - 1 ) {
