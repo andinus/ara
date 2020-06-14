@@ -28,7 +28,7 @@ foreach my $path (@INC) {
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
-     $no_total, @to_hide, %hide );
+     $no_total, @to_hide, %hide, @to_show, %show );
 
 GetOptions(
     "local" => \$use_local_file,
@@ -39,6 +39,7 @@ GetOptions(
     "nototal" => \$no_total,
     "hide=s{1,}" => \@to_hide, # Getopt::Long docs say that this is an
                                # experimental feature with a warning.
+    "show=s{1,}" => \@to_show,
     "help", "h" => sub { HelpMessage() },
 ) or die "Error in command line arguments";
 
@@ -61,6 +62,9 @@ undef @hide{ @to_hide }
                         # Alternatively can do @hide{ @to_hide } = ()
                         # which will work even if @to_hide is empty.
 
+undef @show{ @to_show }
+    if scalar @to_show;
+
 # Alias updated to last updated. This will allow user to just enter
 # updated in hide option.
 undef $hide{'last updated'}
@@ -79,7 +83,8 @@ sub HelpMessage {
     --rows=i  Number of rows to print (i is Integer)
     --nodelta Don't print changes in values
     --nototal Don't print 'Total' row
-    --hide    Hide states, columns from table (space seperated values)";
+    --hide    Hide states, columns from table (space seperated)
+    --show    Show only these states (space seperated)";
     print LOCALCOLOR CYAN "
     --help    Print this help message
 ";
@@ -206,12 +211,21 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
     $state = "Unassigned"
         if $state eq "State Unassigned";
 
-    next
-        if exists $hide{lc $state}
-        # User sees the statecode if length $state > 16 so we also
-        # match against that.
-        or ( length $state > 16
-             and exists $hide{lc $statewise->[$i]{statecode}});
+    # If user has asked to show specific states then forget about hide
+    # option.
+    if ( scalar @to_show ) {
+        next
+            unless exists $show{lc $state}
+            or ( length $state > 16
+                 and exists $show{lc $statewise->[$i]{statecode}})
+    } else {
+        next
+            if exists $hide{lc $state}
+            # User sees the statecode if length $state > 16 so we also
+            # match against that.
+            or ( length $state > 16
+                 and exists $hide{lc $statewise->[$i]{statecode}});
+    }
 
     $state = $statewise->[$i]{statecode}
         if length $state > 16;
