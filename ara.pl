@@ -6,6 +6,7 @@ use warnings;
 use Path::Tiny;
 use Time::Moment;
 use Text::ASCIITable;
+use Number::Format::SouthAsian;
 use Getopt::Long qw( GetOptions );
 use JSON::MaybeXS qw( decode_json );
 use Term::ANSIColor qw( :pushpop );
@@ -197,6 +198,11 @@ if ( $state_notes ) {
         ->plus_minutes(30); # Current time in 'Asia/Kolkata' TimeZone.
 }
 
+my $fmt = Number::Format::SouthAsian->new(
+    words => 1,
+    decimals => 2
+);
+
 my $rows_printed = 0;
 foreach my $i ( 0 ... scalar @$statewise - 1 ) {
     # $rows_printed is incremented at the end of this foreach loop.
@@ -258,63 +264,67 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
                 substr( $lastupdatedtime, 0, 2 );
         }
 
-        my $confirmed = "$statewise->[$i]{confirmed}";
-        my $recovered = "$statewise->[$i]{recovered}";
-        my $deaths = "$statewise->[$i]{deaths}";
+        my $confirmed = $fmt->format_number("$statewise->[$i]{confirmed}");
+        my $recovered = $fmt->format_number("$statewise->[$i]{recovered}");
+        my $deaths = $fmt->format_number("$statewise->[$i]{deaths}");
 
         # Add delta only if it was updated Today.
         if ( $update_info eq "Today"
                  and not $no_delta ) {
+            # Only delta number will get highlighted.
+            $_ .= " " for ($confirmed, $recovered, $deaths);
+
             my $delta_confirmed = $statewise->[$i]{deltaconfirmed};
             if ( $delta_confirmed > 1000 ) {
                 $confirmed .= LOCALCOLOR BLACK ON_MAGENTA
-                    sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+                    sprintf "%+d", $delta_confirmed;
             } elsif ( $delta_confirmed > 500  ) {
                 $confirmed .= LOCALCOLOR BRIGHT_MAGENTA
-                    sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+                    sprintf "%+d", $delta_confirmed;
             } elsif ( $delta_confirmed > 100 ) {
                 $confirmed .= LOCALCOLOR MAGENTA
-                    sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+                    sprintf "%+d", $delta_confirmed;
             } else {
-                $confirmed .= sprintf " (%+d)", $statewise->[$i]{deltaconfirmed};
+                $confirmed .= sprintf "%+d", $delta_confirmed;
             }
 
             my $delta_recovered = $statewise->[$i]{deltarecovered};
             if ( $delta_recovered > 1000 ) {
                 $recovered .= LOCALCOLOR BLACK ON_GREEN
-                    sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+                    sprintf "%+d", $delta_recovered;
             } elsif ( $delta_recovered > 500 ) {
                 $recovered .= LOCALCOLOR BRIGHT_GREEN
-                    sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+                    sprintf "%+d", $delta_recovered;
             } elsif ( $delta_recovered > 100 ) {
                 $recovered .= LOCALCOLOR GREEN
-                    sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+                    sprintf "%+d", $delta_recovered;
             } else {
-                $recovered .= sprintf " (%+d)", $statewise->[$i]{deltarecovered};
+                $recovered .= sprintf "%+d", $delta_recovered;
             }
 
             my $delta_deaths = $statewise->[$i]{deltadeaths};
             if ( $delta_deaths > 100 ) {
                 $state = LOCALCOLOR BLACK ON_RED $state;
                 $deaths .= LOCALCOLOR BLACK ON_RED
-                    sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+                    sprintf "%+d", $delta_deaths;
             } elsif ( $delta_deaths > 50 ) {
                 $state = LOCALCOLOR BRIGHT_RED $state;
                 $deaths .= LOCALCOLOR BRIGHT_RED
-                    sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+                    sprintf "%+d", $delta_deaths;
             } elsif ( $delta_deaths > 25 ) {
                 $state = LOCALCOLOR RED $state;
                 $deaths .= LOCALCOLOR RED
-                    sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+                    sprintf "%+d", $delta_deaths;
             } else {
-                $deaths .= sprintf " (%+d)", $statewise->[$i]{deltadeaths};
+                $deaths .= sprintf "%+d", $delta_deaths;
             }
         }
 
         my @row;
         push @row, $state;
         push @row, $confirmed unless exists $hide{confirmed};
-        push @row, $statewise->[$i]{active} unless exists $hide{active};
+        push @row, $fmt->format_number($statewise->[$i]{active}, words => 0)
+            unless exists $hide{active};
         push @row, $recovered unless exists $hide{recovered};
         push @row, $deaths unless exists $hide{deaths};
         push @row, $update_info unless exists $hide{'last updated'};
