@@ -9,7 +9,10 @@ use Text::ASCIITable;
 use Number::Format::SouthAsian;
 use Getopt::Long qw( GetOptions );
 use JSON::MaybeXS qw( decode_json );
-use Term::ANSIColor qw( :pushpop );
+use Term::ANSIColor qw( :pushpop colored );
+
+local $SIG{__WARN__} = sub { print colored( $_[0], 'yellow' ); };
+local $SIG{__DIE__} = sub { print colored( $_[0], 'red' ); exit 255; };
 
 use constant is_OpenBSD => $^O eq "openbsd";
 require OpenBSD::Unveil
@@ -25,7 +28,7 @@ sub unveil {
 # Unveil @INC.
 foreach my $path (@INC) {
     unveil( $path, 'rx' )
-        or die "Unable to unveil: $!";
+        or die "Unable to unveil: $!\n";
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
@@ -60,12 +63,12 @@ GetOptions(
                                # experimental feature with a warning.
     "show=s{1,}" => \@to_show,
     "help", "h" => sub { HelpMessage() },
-) or die "Error in command line arguments";
+) or die "Error in command line arguments\n";
 
 if ( $use_local_file
          and $get_latest ) {
-    warn LOCALCOLOR YELLOW "Cannot use --local & --latest together
-Overriding --latest option";
+    warn "Cannot use --local & --latest together
+Overriding --latest option\n";
     undef $get_latest;
 }
 
@@ -90,9 +93,8 @@ undef $hide{'last updated'}
     if exists $hide{updated};
 
 # Warn when user tries to hide these columns.
-warn LOCALCOLOR YELLOW "Cannot hide state column" if exists $hide{state};
-warn LOCALCOLOR YELLOW "Cannot hide notes column"
-    if exists $hide{notes} and $state_notes;
+warn "Cannot hide state column\n" if exists $hide{state};
+warn "Cannot hide notes column\n" if exists $hide{notes} and $state_notes;
 
 my $cache_dir = $ENV{XDG_CACHE_HOME} || "$ENV{HOME}/.cache";
 
@@ -111,7 +113,7 @@ my %unveil = (
 # random order everytime.
 foreach my $path ( sort keys %unveil ) {
     unveil( $path, $unveil{$path} )
-        or die "Unable to unveil: $!";
+        or die "Unable to unveil: $!\n";
 }
 
 my $file = "$cache_dir/ara.json";
@@ -123,8 +125,8 @@ if ( -e $file ) {
     $file_mtime = Time::Moment->from_epoch( $file_stat->mtime );
 } else {
     if ( $use_local_file ) {
-        warn LOCALCOLOR YELLOW "File '$file' doesn't exist
-Fetching latest...";
+        warn "File '$file' doesn't exist
+Fetching latest...\n";
         undef $use_local_file;
     }
 }
@@ -158,7 +160,7 @@ my $file_data = path($file)->slurp;
 
 # Block further unveil calls.
 unveil()
-    or die "Unable to lock unveil: $!";
+    or die "Unable to lock unveil: $!\n";
 
 # Decode $file_data to $json_data.
 my $json_data = decode_json($file_data);
@@ -336,8 +338,7 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
     $rows_printed++;
 }
 
-die LOCALCOLOR RED "No rows in table"
-    unless $rows_printed;
+die "No rows in table\n" unless $rows_printed;
 
 # Generate tables.
 if ( $state_notes ) {
