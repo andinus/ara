@@ -31,19 +31,19 @@ foreach my $path (@INC) {
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
-     $no_total, @to_hide, %hide, @to_show, %show, $no_words );
+     $no_total, @to_hide, %hide, @to_show, %show, $no_words, $show_delta );
 
 sub HelpMessage {
     print LOCALCOLOR GREEN "Options:
-    --local   Use local data
-    --latest  Fetch latest data
-    --notes   Print State Notes
-    --rows=i  Number of rows to print (i is Integer)
-    --nodelta Don't print changes in values
-    --nototal Don't print 'Total' row
-    --nowords Don't format numbers with words
-    --hide    Hide states, columns from table (space seperated)
-    --show    Show only these states (space seperated)";
+    --local     Use local data
+    --latest    Fetch latest data
+    --notes     Print State Notes
+    --rows=i    Number of rows to print (i is Integer)
+    --showdelta Print delta values for all rows
+    --nodelta   Don't print changes in values
+    --nowords   Don't format numbers with words
+    --hide      Hide states, columns from table (space seperated)
+    --show      Show only these states (space seperated)";
     print LOCALCOLOR CYAN "
     --help    Print this help message
 ";
@@ -55,6 +55,7 @@ GetOptions(
     "latest" => \$get_latest,
     "notes" => \$state_notes,
     "rows=i" => \$rows_to_print,
+    "showdelta" => \$show_delta,
     "nodelta" => \$no_delta,
     "nototal" => \$no_total,
     "nowords" => \$no_words,
@@ -271,9 +272,10 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
         my $recovered = $fmt->format_number("$statewise->[$i]{recovered}");
         my $deaths = $fmt->format_number("$statewise->[$i]{deaths}");
 
-        # Add delta only if it was updated Today.
-        if ( $update_info eq "Today"
-                 and not $no_delta ) {
+        # Add delta only if it was updated Today or if user has asked.
+        if ( $show_delta
+                 or ( $update_info eq "Today"
+                      and not $no_delta ) ) {
             # Only delta number will get highlighted.
             $_ .= " " for ($confirmed, $recovered, $deaths);
 
