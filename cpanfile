@@ -6,6 +6,5 @@ requires 'Text::ASCIITable', '0.22';
 requires 'Getopt::Long', '2.5';
 requires 'Term::ANSIColor', '5.01';
 requires 'Number::Format::SouthAsian', '0.10';
-
-requires 'IO::Socket::SSL', '1.42'
-    or 'Net::SSLeay', '1.49';
+requires 'IO::Socket::SSL', '1.56';
+requires 'Net::SSLeay', '1.49';
