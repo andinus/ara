@@ -12,7 +12,6 @@ use JSON::MaybeXS qw( decode_json );
 use Term::ANSIColor qw( :pushpop colored );
 
 local $SIG{__WARN__} = sub { print colored( $_[0], 'yellow' ); };
-local $SIG{__DIE__} = sub { print colored( $_[0], 'red' ); exit 255; };
 
 use constant is_OpenBSD => $^O eq "openbsd";
 require OpenBSD::Unveil
