@@ -146,13 +146,10 @@ if ( not $use_local_file
     # Fetch latest data from api.
     my $url = 'https://api.covid19india.org/data.json';
 
-    my $response = HTTP::Simple::getstore($url, $file);
+    my $status = HTTP::Simple::getstore($url, $file);
 
-    die "Failed to fetch latest data...
-Reason: $response->{reason}\n
-Content: $response->{content}
-Status: $response->{status}\n"
-        unless HTTP::Simple::is_success($response);
+    die "Failed to fetch latest data\n"
+        unless HTTP::Simple::is_success($status);
 }
 
 # Slurp api response to $file_data.
