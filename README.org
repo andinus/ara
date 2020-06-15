@@ -53,6 +53,9 @@ n=, where =n= is an integer.
 
 =ara= will only print maximum these many number of rows, if you pass 0 or
 a negative number then =ara= will ignore it & print all the rows.
+*** showdelta
+This will show delta values for every row, default is to show delta only
+on rows that were updated "Today".
 *** nodelta
 This will remove delta values from every column.
 *** nototal
@@ -167,6 +170,9 @@ if ( scalar @to_show ) {
 *** help
 =help= will print help for =ara= which will have little information about
 all these options listed above.
+
+- =nototal= was removed from =help= because =hide= option does the same thing
+  & is recommended.
 ** Cross-platform compatibility
 Previously =ara= had OpenBSD specific code & would simply fail to run on
 other OSes, now it runs on all platforms. There is still OpenBSD
