@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+use lib::relative 'lib';
+use StateNotes;
+
 use Path::Tiny;
 use Time::Moment;
 use Text::ASCIITable;
@@ -167,11 +170,7 @@ my $statewise = $json_data->{statewise};
 
 my ( $covid_19_data, $notes_table, @months, $today );
 
-if ( $state_notes ) {
-    $notes_table = Text::ASCIITable->new( { drawRowLine => 1 } );
-    $notes_table->setCols( qw( State Notes ) );
-    $notes_table->setColWidth( 'Notes', 74 );
-} else {
+unless ( $state_notes ) {
     # Map month number to Months.
     @months = qw( lol Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
 
@@ -238,12 +237,7 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
     $state = $statewise->[$i]{statecode}
         if length $state > 16;
 
-    if ( $state_notes ) {
-        $notes_table->addRow(
-            $state,
-            $statewise->[$i]{statenotes},
-        ) unless length($statewise->[$i]{statenotes}) == 0;
-    } else {
+    unless ( $state_notes ) {
         my $update_info;
         my $lastupdatedtime = $statewise->[$i]{lastupdatedtime};
         my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
@@ -336,11 +330,17 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
     $rows_printed++;
 }
 
-die "No rows in table\n" unless $rows_printed;
-
-# Generate tables.
 if ( $state_notes ) {
-    print $notes_table;
+    my ( $state_notes_table, $rows_in_table ) = StateNotes::get(
+        $statewise,
+        \%hide,
+        \%show,
+        $rows_to_print
+    );
+
+    die "No rows in table\n" unless $rows_in_table;
+    print $state_notes_table;
 } else {
+    die "No rows in table\n" unless $rows_printed;
     print $covid_19_data;
 }
