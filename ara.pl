@@ -221,7 +221,7 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
 
     # If user has asked to show specific states then forget about hide
     # option.
-    if ( scalar @to_show ) {
+    if ( scalar keys %show ) {
         next
             unless exists $show{lc $state}
             or ( length $state > 16
