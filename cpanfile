@@ -8,3 +8,4 @@ requires 'Term::ANSIColor', '5.01';
 requires 'Number::Format::SouthAsian', '0.10';
 requires 'IO::Socket::SSL', '1.56';
 requires 'Net::SSLeay', '1.49';
+requires 'Term::Size', '0.209';
