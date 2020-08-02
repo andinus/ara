@@ -6,6 +6,7 @@ use warnings;
 use lib::relative 'lib';
 use StateNotes;
 
+use Term::Size;
 use Path::Tiny;
 use Time::Moment;
 use Text::ASCIITable;
@@ -34,7 +35,8 @@ foreach my $path (@INC) {
 }
 
 my ( $use_local_file, $get_latest, $state_notes, $rows_to_print, $no_delta,
-     $no_total, @to_hide, %hide, @to_show, %show, $no_words, $show_delta );
+     $no_total, @to_hide, %hide, @to_show, %show, $no_words, $show_delta,
+     $auto_hide );
 
 sub HelpMessage {
     print LOCALCOLOR GREEN "Options:
@@ -45,6 +47,7 @@ sub HelpMessage {
     --showdelta Print delta values for all rows
     --nodelta   Don't print changes in values
     --nowords   Don't format numbers with words
+    --autohide  Automatically hide columns according to term size
     --hide      Hide states, columns from table (space seperated)
     --show      Show only these states (space seperated)";
     print LOCALCOLOR CYAN "
@@ -61,6 +64,7 @@ GetOptions(
     "showdelta" => \$show_delta,
     "nodelta" => \$no_delta,
     "nototal" => \$no_total,
+    "autohide" => \$auto_hide,
     "nowords" => \$no_words,
     "hide=s{1,}" => \@to_hide, # Getopt::Long docs say that this is an
                                # experimental feature with a warning.
@@ -78,6 +82,15 @@ Overriding --latest option\n";
 # To not break --nototal we add "India" to @to_hide.
 push @to_hide, "india"
     if $no_total;
+
+if ( $auto_hide ) {
+    my ( $t_columns, $t_rows ) = Term::Size::chars;
+
+    push @to_hide, "updated" if $t_columns < 110;
+    push @to_hide, "active" if $t_columns < 100;
+    undef $show_delta if $t_columns < 80;
+    $no_delta = 0 if $t_columns < 80;
+}
 
 # Creating %hide and undefining all %hash{@to_hide}, after this we
 # check if %hash{@to_hide} exists with exists keyword. Read this as
