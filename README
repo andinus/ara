@@ -105,8 +105,25 @@ only prints India's Covid stats.
   currently no option to change this behaviour.
 
 
-1.1.9 hide
-╌╌╌╌╌╌╌╌╌╌
+1.1.9 autohide
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+  This will automatically hide some columns if the term size is smaller
+  than expected, it's just a bunch of `if' blocks.
+
+  ┌────
+  │ push @to_hide, "updated" if $t_columns < 110;
+  │ push @to_hide, "active" if $t_columns < 100;
+  │ undef $show_delta if $t_columns < 80;
+  │ $no_delta = 0 if $t_columns < 80;
+  └────
+
+  Currently (2020-08-03) it's just these lines pasted above but that
+  might change so look at the source for latest rules.
+
+
+1.1.10 hide
+╌╌╌╌╌╌╌╌╌╌╌
 
   `hide' is able to hide states & columns from the table, the values
   should be space seperated like `--hide active "last updated"
@@ -129,7 +146,7 @@ only prints India's Covid stats.
   `--hide jk active'.
 
 
-◊ 1.1.9.1 Implementation
+◊ 1.1.10.1 Implementation
 
   `%hide' hash is created from `@to_hide' which was created from user
   arguments by `Getopt::Long'.
@@ -156,7 +173,7 @@ only prints India's Covid stats.
   didn't test which one was the best.
 
 
-  ◊ 1.1.9.1.1 Columns
+  ◊ 1.1.10.1.1 Columns
 
     To make `hide' work we put create `@columns' & push columns to it
     unless the user has asked to hide it.
@@ -168,7 +185,7 @@ only prints India's Covid stats.
     └────
 
 
-  ◊ 1.1.9.1.2 States
+  ◊ 1.1.10.1.2 States
 
     The whole block is skipped if the user has asked to hide the state.
     As said above, statecode is also check if that's what is printed in
@@ -184,7 +201,7 @@ only prints India's Covid stats.
     └────
 
 
-1.1.10 show
+1.1.11 show
 ╌╌╌╌╌╌╌╌╌╌╌
 
   `show' also accepts space seperated values & just like in `hide''s
@@ -196,7 +213,7 @@ only prints India's Covid stats.
   with `hide' for columns.
 
 
-◊ 1.1.10.1 Implementation
+◊ 1.1.11.1 Implementation
 
   `show''s implementation is similar to `hide''s. `%show' hash is
   created from `@to_show'.
@@ -222,7 +239,7 @@ only prints India's Covid stats.
   └────
 
 
-1.1.11 help
+1.1.12 help
 ╌╌╌╌╌╌╌╌╌╌╌
 
   `help' will print help for `ara' which will have little information
