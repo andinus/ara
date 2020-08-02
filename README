@@ -77,6 +77,8 @@ only prints India's Covid stats.
   This will show delta values for every row, default is to show delta
   only on rows that were updated "Today".
 
+  *Note*: This can be disabled by `autohide' option.
+
 
 1.1.6 nodelta
 ╌╌╌╌╌╌╌╌╌╌╌╌╌
