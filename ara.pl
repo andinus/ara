@@ -69,7 +69,7 @@ GetOptions(
     "hide=s{1,}" => \@to_hide, # Getopt::Long docs say that this is an
                                # experimental feature with a warning.
     "show=s{1,}" => \@to_show,
-    "help", "h" => sub { HelpMessage() },
+    "help|h" => sub { HelpMessage() },
 ) or die "Error in command line arguments\n";
 
 if ( $use_local_file
