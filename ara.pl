@@ -253,7 +253,16 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
     unless ( $state_notes ) {
         my $update_info;
         my $lastupdatedtime = $statewise->[$i]{lastupdatedtime};
-        my $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
+        my $last_update_dmy;
+
+        # Previously dates were in dd/mm/YYYY format, currently some
+        # are in d/m/YYYY format. This block fixes issues with
+        # d/m/YYYY format.
+        if ( substr( $lastupdatedtime, 1, 1 ) eq "/" ) {
+            $last_update_dmy = substr( $lastupdatedtime, 0, 9 );
+        } else {
+            $last_update_dmy = substr( $lastupdatedtime, 0, 10 );
+        }
 
         # Add $update_info.
         if ( $last_update_dmy
@@ -266,10 +275,14 @@ foreach my $i ( 0 ... scalar @$statewise - 1 ) {
                       eq $today->plus_days(1)->strftime( "%d/%m/%Y" ) ) {
             $update_info = "Tomorrow"; # Hopefully we don't see this.
         } else {
-            $update_info =
-                $months[substr( $lastupdatedtime, 3, 2 )] .
-                " " .
-                substr( $lastupdatedtime, 0, 2 );
+            # Previously dates were in dd/mm/YYYY format, currently
+            # some are in d/m/YYYY format. This block fixes issues
+            # with d/m/YYYY format.
+            $update_info = ( substr( $lastupdatedtime, 1, 1 ) eq "/" )
+                ? ($months[substr( $lastupdatedtime, 2, 1 )] . " "
+                   . substr( $lastupdatedtime, 0, 1 ))
+                : ($months[substr( $lastupdatedtime, 3, 2 )] . " "
+                   . substr( $lastupdatedtime, 0, 2 ));
         }
 
         my $confirmed = $fmt->format_number("$statewise->[$i]{confirmed}");
