@@ -8,18 +8,16 @@
 Table of Contents
 ─────────────────
 
-1 Documentation
-.. 1.1 Options
-.. 1.2 Cross-platform compatibility
-2 Demo Videos
+Documentation
+Demo Videos
 
 
 Ara is a simple cli program that prints Covid-19 stats. Currently it
 only prints India's Covid stats.
 
 
-1 Documentation
-═══════════════
+Documentation
+═════════════
 
   `ara' by default will first look for the file in `$XDG_CACHE_HOME', if
   that is not set then `HOME/.cache' is used, the file name is assumed
@@ -36,18 +34,18 @@ only prints India's Covid stats.
   identity is verified.
 
 
-1.1 Options
-───────────
+Options
+───────
 
-1.1.1 local
-╌╌╌╌╌╌╌╌╌╌╌
+local
+╌╌╌╌╌
 
   This option forces `ara' to use the data available locally, it will
   only override this option when the file doesn't exist on disk.
 
 
-1.1.2 latest
-╌╌╌╌╌╌╌╌╌╌╌╌
+latest
+╌╌╌╌╌╌
 
   This will force `ara' to fetch the latest data.
 
@@ -55,14 +53,14 @@ only prints India's Covid stats.
   print a warning & latest option will be ignored.
 
 
-1.1.3 notes
-╌╌╌╌╌╌╌╌╌╌╌
+notes
+╌╌╌╌╌
 
   Only state notes will be printed if this option is passed.
 
 
-1.1.4 rows
-╌╌╌╌╌╌╌╌╌╌
+rows
+╌╌╌╌
 
   `rows' option takes an integer as argument which can be passed as
   `--rows n', where `n' is an integer.
@@ -71,8 +69,8 @@ only prints India's Covid stats.
   or a negative number then `ara' will ignore it & print all the rows.
 
 
-1.1.5 showdelta
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+showdelta
+╌╌╌╌╌╌╌╌╌
 
   This will show delta values for every row, default is to show delta
   only on rows that were updated "Today".
@@ -80,14 +78,14 @@ only prints India's Covid stats.
   *Note*: This can be disabled by `autohide' option.
 
 
-1.1.6 nodelta
-╌╌╌╌╌╌╌╌╌╌╌╌╌
+nodelta
+╌╌╌╌╌╌╌
 
   This will remove delta values from every column.
 
 
-1.1.7 nototal
-╌╌╌╌╌╌╌╌╌╌╌╌╌
+nototal
+╌╌╌╌╌╌╌
 
   This will remove the "Total" or "India" row from the table.
 
@@ -95,8 +93,8 @@ only prints India's Covid stats.
   kept for backwards compatibility.
 
 
-1.1.8 nowords
-╌╌╌╌╌╌╌╌╌╌╌╌╌
+nowords
+╌╌╌╌╌╌╌
 
   "Confirmed", "Recovered" & "Deaths" column format numbers in words.
   For example, "1.6 lakhs" instead of "1,60,000" which makes it easier
@@ -107,8 +105,8 @@ only prints India's Covid stats.
   currently no option to change this behaviour.
 
 
-1.1.9 autohide
-╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+autohide
+╌╌╌╌╌╌╌╌
 
   This will automatically hide some columns if the term size is smaller
   than expected, it's just a bunch of `if' blocks.
@@ -124,8 +122,8 @@ only prints India's Covid stats.
   might change so look at the source for latest rules.
 
 
-1.1.10 hide
-╌╌╌╌╌╌╌╌╌╌╌
+hide
+╌╌╌╌
 
   `hide' is able to hide states & columns from the table, the values
   should be space seperated like `--hide active "last updated"
@@ -148,7 +146,7 @@ only prints India's Covid stats.
   `--hide jk active'.
 
 
-◊ 1.1.10.1 Implementation
+◊ Implementation
 
   `%hide' hash is created from `@to_hide' which was created from user
   arguments by `Getopt::Long'.
@@ -175,10 +173,11 @@ only prints India's Covid stats.
   didn't test which one was the best.
 
 
-  ◊ 1.1.10.1.1 Columns
+  ◊ Columns
 
     To make `hide' work we put create `@columns' & push columns to it
     unless the user has asked to hide it.
+
     ┌────
     │ my @columns;
     │
@@ -187,12 +186,13 @@ only prints India's Covid stats.
     └────
 
 
-  ◊ 1.1.10.1.2 States
+  ◊ States
 
     The whole block is skipped if the user has asked to hide the state.
     As said above, statecode is also check if that's what is printed in
     the table which is true only if `length $state > 16'. There is no
     good reason for not checking statecode for everything.
+
     ┌────
     │ next
     │     if exists $hide{lc $state}
@@ -203,8 +203,8 @@ only prints India's Covid stats.
     └────
 
 
-1.1.11 show
-╌╌╌╌╌╌╌╌╌╌╌
+show
+╌╌╌╌
 
   `show' also accepts space seperated values & just like in `hide''s
   case it's experimental & can change in future.
@@ -215,7 +215,7 @@ only prints India's Covid stats.
   with `hide' for columns.
 
 
-◊ 1.1.11.1 Implementation
+◊ Implementation
 
   `show''s implementation is similar to `hide''s. `%show' hash is
   created from `@to_show'.
@@ -241,8 +241,8 @@ only prints India's Covid stats.
   └────
 
 
-1.1.12 help
-╌╌╌╌╌╌╌╌╌╌╌
+help
+╌╌╌╌
 
   `help' will print help for `ara' which will have little information
   about all these options listed above.
@@ -251,8 +251,8 @@ only prints India's Covid stats.
     same thing & is recommended.
 
 
-1.2 Cross-platform compatibility
-────────────────────────────────
+Cross-platform compatibility
+────────────────────────────
 
   Previously `ara' had OpenBSD specific code & would simply fail to run
   on other OSes, now it runs on all platforms. There is still OpenBSD
@@ -301,15 +301,15 @@ only prints India's Covid stats.
   expected to fix this by adding the path to `OpenBSD::' in `@INC'.
 
 
-2 Demo Videos
-═════════════
+Demo Videos
+═══════════
 
   • [Ara 2020-06-14] (new options)
   • [Ara 2020-06-06]
 
 
 [Ara 2020-06-14]
-https://diode.zone/videos/watch/95868534-8aae-497b-806e-5766236bb058
+<https://diode.zone/videos/watch/95868534-8aae-497b-806e-5766236bb058>
 
 [Ara 2020-06-06]
-https://diode.zone/videos/watch/03be044d-6ab7-4f01-8769-0084674dec93
+<https://diode.zone/videos/watch/03be044d-6ab7-4f01-8769-0084674dec93>
